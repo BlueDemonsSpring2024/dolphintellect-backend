@@ -8,6 +8,7 @@ import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRe
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,15 +35,43 @@ public class StudentController {
         return studentRepository.findAll();
     }
 
-
-
     //Get Single Student
     @GetMapping("/id/{id}")
     public Optional<Student> findById(@PathVariable String id){
-        System.out.println("ID=" +id);
         Optional<Student> data = studentRepository.findById(id);
 
-        System.out.println(data);
+        ArrayList<String> gradeList = new ArrayList<>();
+
+        List<EnrolledCourse> enrolledCourses = data.get().getEnrolledCourses();
+
+        for(EnrolledCourse enrolledCourse : enrolledCourses){
+            String courseGrade = enrolledCourse.getFinalGrade();
+            gradeList.add(courseGrade);
+        }
+
+        double gradeSums = 0;
+
+        for(String grade : gradeList){
+            switch (grade){
+                case "A": gradeSums += 4; break;
+                case "A-": gradeSums += 3.7; break;
+                case "B+": gradeSums += 3.3; break;
+                case "B": gradeSums += 3; break;
+                case "B-": gradeSums += 2.7; break;
+                case "C+": gradeSums += 2.3; break;
+                case "C": gradeSums += 2; break;
+                case "C-": gradeSums += 1.7; break;
+                case "D+": gradeSums += 1.3; break;
+                case "D": gradeSums += 1; break;
+                case "D-": gradeSums += 0.7; break;
+                case "F": gradeSums += 0; break;
+            }
+        }
+
+        double gpa = gradeSums / gradeList.size();
+
+        gpa = Math.ceil(gpa * 100) / 100;
+        data.get().setGpa(gpa);
         return data;
     }
 
@@ -65,10 +94,6 @@ public class StudentController {
 
 
 
-
-
-
-
     //SingleStudent get enrolled courses
     @GetMapping("/{id}/enrolledcourses")
     public List<EnrolledCourse> findEnrolledCoursesByStudentID(@PathVariable String id){
@@ -81,44 +106,18 @@ public class StudentController {
 
     @GetMapping(value = "/{id}/enrolledcourses", params = {"year"})
     public List<EnrolledCourse>findEnrolledCoursesForYearByStudentID(@PathVariable String id, @RequestParam(required = false) int year){
-//        System.out.println("Looking for ENROLLED COURSE FOR STUDENT");
-
         List<EnrolledCourse> ec = studentRepository.findById(id).get().getEnrolledCourses();
-
         List<EnrolledCourse> courseList = new ArrayList<>();
-
         for(EnrolledCourse e: ec){
             if(e.getYear() == year){
                 courseList.add(e);
             }
         }
-
         return courseList;
-
     }
 
 
-
-
-
-    //SingleStudent get specific course
-//    @GetMapping("/{id}/enrolledcourse/{course_id}")
-//    public Optional<EnrolledCourse> findById(@PathVariable String id, @PathVariable Long course_id){
-//        Optional<Student> student = studentRepository.findById(id);
-//
-//       EnrolledCourse ec = null;
-//
-//        for(EnrolledCourse c:  student.get().getEnrolledCourses()){
-//            System.out.println(c);
-//            if(c.getId() == course_id){
-//                ec = c;
-//            }
-//        }
-//
-//        return Optional.ofNullable(ec);
-//    }
-
-
+    //Create Student
     @PostMapping
     public void addStudent(@RequestBody Student newStudent){
         System.out.println(newStudent.getName());
