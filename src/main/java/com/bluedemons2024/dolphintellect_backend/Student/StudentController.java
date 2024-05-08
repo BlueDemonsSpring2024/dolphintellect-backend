@@ -17,6 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/student")
 
+@SuppressWarnings("deprecation")
 public class StudentController {
 
     private final StudentRepository studentRepository;
@@ -38,48 +39,22 @@ public class StudentController {
 
     //Get Single Student
     @GetMapping("/id/{id}")
-    public Optional<Student> findById(@PathVariable String id){
+    public Student findById(@PathVariable String id){
         Optional<Student> data = studentRepository.findById(id);
+        Student student = data.orElse(null);
 
-        ArrayList<String> gradeList = new ArrayList<>();
-
-        List<EnrolledCourse> enrolledCourses = data.get().getEnrolledCourses();
+        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
 
         for(EnrolledCourse enrolledCourse : enrolledCourses){
-            String courseGrade = enrolledCourse.getFinalGrade();
-            gradeList.add(courseGrade);
-
             //TEMP!! Move to a better location
-            double calculatedGrade = this.calculateCourseGrade(id, enrolledCourse.getCourse().getId());
+            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(id, enrolledCourse.getCourse().getId());
+            enrolledCourse.setGradeItems(gradeItemList);
+
+            double calculatedGrade = enrolledCourse.calculateCourseGrade();
             enrolledCourse.setCalculatedGrade(calculatedGrade);
-            enrolledCourseRepository.save(enrolledCourse);
-
         }
 
-        double gradeSums = 0;
-
-        for(String grade : gradeList){
-            switch (grade){
-                case "A": gradeSums += 4; break;
-                case "A-": gradeSums += 3.7; break;
-                case "B+": gradeSums += 3.3; break;
-                case "B": gradeSums += 3; break;
-                case "B-": gradeSums += 2.7; break;
-                case "C+": gradeSums += 2.3; break;
-                case "C": gradeSums += 2; break;
-                case "C-": gradeSums += 1.7; break;
-                case "D+": gradeSums += 1.3; break;
-                case "D": gradeSums += 1; break;
-                case "D-": gradeSums += 0.7; break;
-                case "F": gradeSums += 0; break;
-            }
-        }
-
-        double gpa = gradeSums / gradeList.size();
-
-        gpa = Math.ceil(gpa * 100) / 100;
-        data.get().setGpa(gpa);
-        return data;
+        return student;
     }
 
 
@@ -149,44 +124,20 @@ public class StudentController {
 
 
 
-
-    //TODO: implement calculator for a course grade
-    public double calculateCourseGrade(String studentID, String courseID){
-        double weightTotal = 0;
-        double scoreTotal = 0;
-
-        // find the student
-        Optional<Student> student = studentRepository.findById(studentID);
-
-        //Get the student gradeItems
-        List<GradeItem> gradeItems = student.get().getGradeItems();
+    //TODO: get grade items for a specific course
+    public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
+        List<GradeItem> gradeItems = studentRepository.findById(studentID).get().getGradeItems();
+        List<GradeItem> gradeItemsListForCourse = new ArrayList<>();
 
         for(GradeItem gradeItem : gradeItems){
             String courseIDForGradeItem = gradeItem.getCourse().getId();
-
             if(courseID.equals(courseIDForGradeItem)){
-                double scoreWeightProduct = gradeItem.getScore() * gradeItem.getWeight();
-                System.out.println("scoreWeightProduct: " + scoreWeightProduct);
-                scoreTotal += scoreWeightProduct;
-                weightTotal += gradeItem.getWeight();
+                gradeItemsListForCourse.add(gradeItem);
             }
-
         }
 
-        double calculatedGrade = scoreTotal / weightTotal;
-
-
-        System.out.println("Calculated Grade: " + calculatedGrade);
-        System.out.println(String.format("Calculated Grade for %s: %f", courseID, calculatedGrade));
-
-        return calculatedGrade;
-
+        return gradeItemsListForCourse;
     }
-
-
-
-
-    //TODO: get grade items for a specific course
 
 
     //TODO: get all grade items for a student
