@@ -20,6 +20,15 @@ public class EnrolledCourse {
     private int year;
     private int credits;
     private String finalGrade;
+    private double calculatedGrade;
+
+    public double getCalculatedGrade() {
+        return calculatedGrade;
+    }
+
+    public void setCalculatedGrade(double calculatedGrade) {
+        this.calculatedGrade = calculatedGrade;
+    }
 
     @TargetNode
     private Course course;

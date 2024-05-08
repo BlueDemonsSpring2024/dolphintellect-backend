@@ -8,10 +8,8 @@ import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRe
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
-import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +48,12 @@ public class StudentController {
         for(EnrolledCourse enrolledCourse : enrolledCourses){
             String courseGrade = enrolledCourse.getFinalGrade();
             gradeList.add(courseGrade);
+
+            //TEMP!! Move to a better location
+            double calculatedGrade = this.calculateCourseGrade(id, enrolledCourse.getCourse().getId());
+            enrolledCourse.setCalculatedGrade(calculatedGrade);
+            enrolledCourseRepository.save(enrolledCourse);
+
         }
 
         double gradeSums = 0;
@@ -143,6 +147,55 @@ public class StudentController {
 
 
 
+
+
+
+    //TODO: implement calculator for a course grade
+    public double calculateCourseGrade(String studentID, String courseID){
+        double weightTotal = 0;
+        double scoreTotal = 0;
+
+        // find the student
+        Optional<Student> student = studentRepository.findById(studentID);
+
+        //Get the student gradeItems
+        List<GradeItem> gradeItems = student.get().getGradeItems();
+
+        for(GradeItem gradeItem : gradeItems){
+            String courseIDForGradeItem = gradeItem.getCourse().getId();
+
+            if(courseID.equals(courseIDForGradeItem)){
+                double scoreWeightProduct = gradeItem.getScore() * gradeItem.getWeight();
+                System.out.println("scoreWeightProduct: " + scoreWeightProduct);
+                scoreTotal += scoreWeightProduct;
+                weightTotal += gradeItem.getWeight();
+            }
+
+        }
+
+        double calculatedGrade = scoreTotal / weightTotal;
+
+
+        System.out.println("Calculated Grade: " + calculatedGrade);
+        System.out.println(String.format("Calculated Grade for %s: %f", courseID, calculatedGrade));
+
+        return calculatedGrade;
+
+    }
+
+
+
+
+    //TODO: get grade items for a specific course
+
+
+    //TODO: get all grade items for a student
+
+
+
+
+
+
     //Add a grade item for a course
     @PostMapping("/gradeItem")
     public void addGradeItem(@RequestBody GradeItemWrapper gradeItemWrapper){
@@ -159,11 +212,6 @@ public class StudentController {
 
         student.get().setGradeItem(gradeItem);
         studentRepository.save(student.get());
-
-
-
-
-
     }
 
 
