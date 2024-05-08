@@ -11,8 +11,6 @@ import java.util.List;
 @Node(value = "Student")
 public class Student {
 
-
-
     @Id
     @GeneratedValue(UUIDStringGenerator.class)
     private String id;

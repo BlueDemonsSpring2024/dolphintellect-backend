@@ -17,6 +17,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/student")
 
+@SuppressWarnings("deprecation")
 public class StudentController {
 
     private final StudentRepository studentRepository;
@@ -49,10 +50,19 @@ public class StudentController {
             String courseGrade = enrolledCourse.getFinalGrade();
             gradeList.add(courseGrade);
 
+
             //TEMP!! Move to a better location
-            double calculatedGrade = this.calculateCourseGrade(id, enrolledCourse.getCourse().getId());
+            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(id, enrolledCourse.getCourse().getId());
+            enrolledCourse.setGradeItems(gradeItemList);
+//            enrolledCourseRepository.save(enrolledCourse);
+
+
+
+            //TEMP!! Move to a better location
+            double calculatedGrade = enrolledCourse.calculateCourseGrade();
+//            double otherCalc = enrolledCourse.calculateCourseGrade();
             enrolledCourse.setCalculatedGrade(calculatedGrade);
-            enrolledCourseRepository.save(enrolledCourse);
+//            enrolledCourseRepository.save(enrolledCourse);
 
         }
 
@@ -150,43 +160,23 @@ public class StudentController {
 
 
 
-    //TODO: implement calculator for a course grade
-    public double calculateCourseGrade(String studentID, String courseID){
-        double weightTotal = 0;
-        double scoreTotal = 0;
-
-        // find the student
-        Optional<Student> student = studentRepository.findById(studentID);
-
-        //Get the student gradeItems
-        List<GradeItem> gradeItems = student.get().getGradeItems();
-
-        for(GradeItem gradeItem : gradeItems){
-            String courseIDForGradeItem = gradeItem.getCourse().getId();
-
-            if(courseID.equals(courseIDForGradeItem)){
-                double scoreWeightProduct = gradeItem.getScore() * gradeItem.getWeight();
-                System.out.println("scoreWeightProduct: " + scoreWeightProduct);
-                scoreTotal += scoreWeightProduct;
-                weightTotal += gradeItem.getWeight();
-            }
-
-        }
-
-        double calculatedGrade = scoreTotal / weightTotal;
-
-
-        System.out.println("Calculated Grade: " + calculatedGrade);
-        System.out.println(String.format("Calculated Grade for %s: %f", courseID, calculatedGrade));
-
-        return calculatedGrade;
-
-    }
-
 
 
 
     //TODO: get grade items for a specific course
+    public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
+        List<GradeItem> gradeItems = studentRepository.findById(studentID).get().getGradeItems();
+        List<GradeItem> gradeItemsListForCourse = new ArrayList<>();
+
+        for(GradeItem gradeItem : gradeItems){
+            String courseIDForGradeItem = gradeItem.getCourse().getId();
+            if(courseID.equals(courseIDForGradeItem)){
+                gradeItemsListForCourse.add(gradeItem);
+            }
+        }
+
+        return gradeItemsListForCourse;
+    }
 
 
     //TODO: get all grade items for a student
