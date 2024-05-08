@@ -2,6 +2,7 @@ package com.bluedemons2024.dolphintellect_backend.Student;
 
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
+import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
@@ -26,6 +27,9 @@ public class Student {
     @Relationship(type="IS_ENROLLED_IN", direction = Relationship.Direction.OUTGOING)
     private List<EnrolledCourse> enrolledCourses;
 
+    @Relationship(type = "HAS_GRADE_ITEM_FOR", direction = Relationship.Direction.OUTGOING)
+    private List<GradeItem> gradeItems;
+
     public Student(String id, String name) {
         this.id = id;
         this.name = name;
@@ -38,6 +42,17 @@ public class Student {
         return enrolledCourse;
     }
 
+    public List<GradeItem> getGradeItems() {
+        return gradeItems;
+    }
+
+    public void setGradeItems(List<GradeItem> gradeItems) {
+        this.gradeItems = gradeItems;
+    }
+
+    public void setGradeItem(GradeItem gradeItem) {
+        this.gradeItems.add(gradeItem);
+    }
 
     public double getGpa(){
        return this.gpa;

@@ -6,6 +6,9 @@ import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
+import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
+import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
@@ -139,6 +142,29 @@ public class StudentController {
     }
 
 
+
+    //Add a grade item for a course
+    @PostMapping("/gradeItem")
+    public void addGradeItem(@RequestBody GradeItemWrapper gradeItemWrapper){
+
+        String studentID = gradeItemWrapper.getStudentID();
+        String courseID = gradeItemWrapper.getCourseID();
+
+        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
+
+        Optional<Student> student = studentRepository.findById(studentID);
+        Optional<Course> course = courseRepository.findById(courseID);
+
+        gradeItem.setCourse(course.get());
+
+        student.get().setGradeItem(gradeItem);
+        studentRepository.save(student.get());
+
+
+
+
+
+    }
 
 
 }

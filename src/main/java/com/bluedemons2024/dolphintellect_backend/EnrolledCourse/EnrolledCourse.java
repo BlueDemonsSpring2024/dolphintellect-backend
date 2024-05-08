@@ -16,9 +16,6 @@ public class EnrolledCourse {
     @Id @GeneratedValue
     private Long id;
 
-
-
-
     private String term;
     private int year;
     private int credits;
@@ -27,8 +24,6 @@ public class EnrolledCourse {
     @TargetNode
     private Course course;
 
-//    @TargetNode
-//    private Student student;
 
     public void setYear(int year) {
         this.year = year;
