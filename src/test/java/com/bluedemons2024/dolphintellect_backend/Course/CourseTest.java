@@ -26,8 +26,8 @@ class CourseTest {
     @Test
     void setSubject() {
         Course course = new Course();
-        course.setSubject("Fake Subject");
-        assertEquals("Fake Subject",course.getSubject());
+        course.setSubject("Some Subject");
+        assertEquals("Some Subject",course.getSubject());
 
     }
 
