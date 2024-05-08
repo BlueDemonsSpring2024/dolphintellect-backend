@@ -39,57 +39,22 @@ public class StudentController {
 
     //Get Single Student
     @GetMapping("/id/{id}")
-    public Optional<Student> findById(@PathVariable String id){
+    public Student findById(@PathVariable String id){
         Optional<Student> data = studentRepository.findById(id);
+        Student student = data.orElse(null);
 
-        ArrayList<String> gradeList = new ArrayList<>();
-
-        List<EnrolledCourse> enrolledCourses = data.get().getEnrolledCourses();
+        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
 
         for(EnrolledCourse enrolledCourse : enrolledCourses){
-            String courseGrade = enrolledCourse.getFinalGrade();
-            gradeList.add(courseGrade);
-
-
             //TEMP!! Move to a better location
             List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(id, enrolledCourse.getCourse().getId());
             enrolledCourse.setGradeItems(gradeItemList);
-//            enrolledCourseRepository.save(enrolledCourse);
 
-
-
-            //TEMP!! Move to a better location
             double calculatedGrade = enrolledCourse.calculateCourseGrade();
-//            double otherCalc = enrolledCourse.calculateCourseGrade();
             enrolledCourse.setCalculatedGrade(calculatedGrade);
-//            enrolledCourseRepository.save(enrolledCourse);
-
         }
 
-        double gradeSums = 0;
-
-        for(String grade : gradeList){
-            switch (grade){
-                case "A": gradeSums += 4; break;
-                case "A-": gradeSums += 3.7; break;
-                case "B+": gradeSums += 3.3; break;
-                case "B": gradeSums += 3; break;
-                case "B-": gradeSums += 2.7; break;
-                case "C+": gradeSums += 2.3; break;
-                case "C": gradeSums += 2; break;
-                case "C-": gradeSums += 1.7; break;
-                case "D+": gradeSums += 1.3; break;
-                case "D": gradeSums += 1; break;
-                case "D-": gradeSums += 0.7; break;
-                case "F": gradeSums += 0; break;
-            }
-        }
-
-        double gpa = gradeSums / gradeList.size();
-
-        gpa = Math.ceil(gpa * 100) / 100;
-        data.get().setGpa(gpa);
-        return data;
+        return student;
     }
 
 
@@ -154,10 +119,6 @@ public class StudentController {
 //        System.out.println("Getting Course By ID");
         studentRepository.deleteById(id);
     }
-
-
-
-
 
 
 

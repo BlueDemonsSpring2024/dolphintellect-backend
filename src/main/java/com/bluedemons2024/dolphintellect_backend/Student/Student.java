@@ -6,6 +6,7 @@ import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Node(value = "Student")
@@ -53,7 +54,8 @@ public class Student {
     }
 
     public double getGpa(){
-       return this.gpa;
+//       return this.gpa;
+        return this.calculateGPA();
     }
 
     public void setGpa(double gpa){
@@ -75,6 +77,42 @@ public class Student {
     public List<EnrolledCourse> getEnrolledCourses() {
         return enrolledCourses;
     }
+
+    private double calculateGPA(){
+
+        ArrayList<String> gradeList = new ArrayList<>();
+
+        for(EnrolledCourse enrolledCourse : enrolledCourses){
+            String finalCourseGrade = enrolledCourse.getFinalGrade();
+            gradeList.add(finalCourseGrade);
+        }
+
+        double gradeSums = 0;
+
+        for(String grade : gradeList){
+            switch (grade){
+                case "A": gradeSums += 4; break;
+                case "A-": gradeSums += 3.7; break;
+                case "B+": gradeSums += 3.3; break;
+                case "B": gradeSums += 3; break;
+                case "B-": gradeSums += 2.7; break;
+                case "C+": gradeSums += 2.3; break;
+                case "C": gradeSums += 2; break;
+                case "C-": gradeSums += 1.7; break;
+                case "D+": gradeSums += 1.3; break;
+                case "D": gradeSums += 1; break;
+                case "D-": gradeSums += 0.7; break;
+                case "F": gradeSums += 0; break;
+            }
+        }
+
+        double gpa = gradeSums / gradeList.size();
+        gpa = Math.ceil(gpa * 100) / 100;
+        return gpa;
+
+    }
+
+
 
 
 }

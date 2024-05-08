@@ -51,12 +51,6 @@ public class EnrolledCourse {
         List<GradeItem> gradeItems = this.gradeItems;
 
         for(GradeItem gradeItem : gradeItems){
-//            String courseIDForGradeItem = gradeItem.getCourse().getId();
-            System.out.println("================================");
-            System.out.println(this.course.getTitle());
-            System.out.println(gradeItem.getName());
-
-
 //            if(courseID.equals(courseIDForGradeItem)){
                 double scoreWeightProduct = gradeItem.getScore() * gradeItem.getWeight();
 //                System.out.println("scoreWeightProduct: " + scoreWeightProduct);
@@ -64,14 +58,9 @@ public class EnrolledCourse {
                 weightTotal += gradeItem.getWeight();
 //            }
 
-            System.out.println("================================");
         }
 
         double calculatedGrade = scoreTotal / weightTotal;
-
-
-        System.out.println("INTERNAL Calculated Grade : " + calculatedGrade);
-        System.out.println("END+++++++++++++++++++++++++++++");
 
         return calculatedGrade;
 
