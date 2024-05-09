@@ -1,6 +1,5 @@
 package com.bluedemons2024.dolphintellect_backend.config;
 
-import org.neo4j.driver.AuthToken;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
