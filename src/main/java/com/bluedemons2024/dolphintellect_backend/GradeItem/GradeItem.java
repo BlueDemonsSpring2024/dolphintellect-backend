@@ -1,6 +1,8 @@
 package com.bluedemons2024.dolphintellect_backend.GradeItem;
 
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
@@ -20,6 +22,7 @@ public class GradeItem {
     private String name;
 
     @TargetNode
+    @JsonIgnore
     private Course course;
 
     public Course getCourse() {
