@@ -1,11 +1,11 @@
 package com.bluedemons2024.dolphintellect_backend.GradeItem;
 
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
-import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
 @RelationshipProperties
 public class GradeItem {
@@ -20,6 +20,7 @@ public class GradeItem {
     private String name;
 
     @TargetNode
+    @JsonIgnore
     private Course course;
 
     public Course getCourse() {
@@ -54,13 +55,6 @@ public class GradeItem {
         this.score = score;
     }
 
-//    public String getCategory() {
-//        return category;
-//    }
-//
-//    public void setCategory(String category) {
-//        this.category = category;
-//    }
 
     public String getName() {
         return name;

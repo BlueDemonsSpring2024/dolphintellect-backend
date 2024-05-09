@@ -43,7 +43,6 @@ public class EnrolledCourse {
     private Course course;
 
     public double calculateCourseGrade(){
-        System.out.println("BEGIN+++++++++++++++++++++++++++++");
 
         double weightTotal = 0;
         double scoreTotal = 0;

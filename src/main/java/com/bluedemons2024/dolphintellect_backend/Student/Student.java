@@ -3,6 +3,7 @@ package com.bluedemons2024.dolphintellect_backend.Student;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.UUIDStringGenerator;
 
@@ -26,6 +27,7 @@ public class Student {
     @Relationship(type="IS_ENROLLED_IN", direction = Relationship.Direction.OUTGOING)
     private List<EnrolledCourse> enrolledCourses;
 
+    @JsonIgnore
     @Relationship(type = "HAS_GRADE_ITEM_FOR", direction = Relationship.Direction.OUTGOING)
     private List<GradeItem> gradeItems;
 
