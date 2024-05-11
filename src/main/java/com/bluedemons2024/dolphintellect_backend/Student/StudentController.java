@@ -10,6 +10,7 @@ import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,16 @@ public class StudentController {
     public List<Student> findAll(){
         return studentRepository.findAll();
     }
+
+
+    //TODO: DELETE THIS. ITS ONLY FOR DEVELOPMENT TESTING
+    @GetMapping("/current")
+    public String getCurrentStudent(Principal principal){
+        return "Current " + principal.getName();
+    }
+
+
+
 
     //Get Single Student
     @GetMapping("/id/{id}")
