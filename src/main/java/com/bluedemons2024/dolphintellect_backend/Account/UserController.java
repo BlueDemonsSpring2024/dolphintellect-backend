@@ -8,37 +8,40 @@ import java.util.List;
 @RestController
 @RequestMapping("/accounts")
 
-public class AccountController {
+public class UserController {
 
     @Autowired
-    AccountRepository accountRepository;
+    UserRepistory userRepistory;
 
-    @GetMapping
-    public List<Account> getAllAccounts(){
-        return accountRepository.findAll();
-    }
+//    @GetMapping
+//    public List<UserEntity> getAllAccounts(){
+//        return userRepistory.findAll();
+//    }
 
     // TODO: Create functions to get user login
 
 
     // Register Account
     @PostMapping("/register")
-    public void registerAccount(@RequestBody Account account){
+    public void registerAccount(@RequestBody UserEntity account){
 //        Account account = new Account();
         System.out.println(account);
-        accountRepository.save(account);
+        userRepistory.save(account);
 
-//        return accountRepository.
+//        return userRepistory.
     }
 
 
 
 
-//    // Login Account
+
+    // Login Account
 //    @PostMapping("/login")
 //    public void loginAccount(@RequestBody Account account){
-//        accountRepository.findOne(account);
+//        userRepistory.findOne(account);
 //    }
+
+
 
 
 
