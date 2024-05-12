@@ -19,13 +19,13 @@ public class DolphIntellectBackend {
     }
 
 
-    @Bean
-    CommandLineRunner init(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
-        return args -> {
-            accountRepository.save(new Account("user", "user@sample.com",passwordEncoder.encode("password"),"5gggoin22rgnoin", "USER"));
-            accountRepository.save(new Account("admin", "admin@sample.com",passwordEncoder.encode("password"),null, "ADMIN"));
-
-        };
-    }
+//    @Bean
+//    CommandLineRunner init(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+//        return args -> {
+//            accountRepository.save(new Account("user", "user@sample.com",passwordEncoder.encode("password"),"5gggoin22rgnoin", "USER"));
+//            accountRepository.save(new Account("admin", "admin@sample.com",passwordEncoder.encode("password"),null, "ADMIN"));
+//
+//        };
+//    }
 }
 

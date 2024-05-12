@@ -37,12 +37,14 @@ public class AuthController {
 
     @GetMapping
     public String home(){
+        System.out.println("Home requested");
         return "Hello World!";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public String admin(){
+        System.out.println("Admin requested");
         return "Hello Admin!";
     }
 

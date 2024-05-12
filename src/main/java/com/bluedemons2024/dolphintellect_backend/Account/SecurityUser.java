@@ -1,8 +1,10 @@
 package com.bluedemons2024.dolphintellect_backend.Account;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,11 +19,15 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.account.getEmail();
+        System.out.println("Getting username");
+        System.out.println(this.account.getUsername());
+//        return this.account.getEmail();
+        return account.getUsername();
     }
 
     @Override
     public String getPassword() {
+        System.out.println("Getting password");
         return this.account.getPassword();
     }
 
@@ -29,7 +35,15 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        System.out.println("Getting Authority");
+        System.out.println(this.account.getRole());
+
+//        return List.of();
+        return Arrays.stream(this.account
+                        .getRole()
+                        .split(","))
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
 
