@@ -1,6 +1,10 @@
 package com.bluedemons2024.dolphintellect_backend.Account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-public interface AccountRepository extends JpaRepository<Account, Integer> {
+import java.util.Optional;
+
+public interface AccountRepository extends CrudRepository<Account, Long> {
+    Optional<Account> findByUsername(String username);
 }

@@ -7,29 +7,36 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Long id;
+    String username;
     String email;
     String password;
+    String role;
 
     @Column(name="student_id")
     String studentID;
 
-    public Account(int id, String email, String password, String studentID) {
-        this.id = id;
+    public Account(String username, String email, String password, String studentID, String role) {
+//        this.id = id;
         this.email = email;
         this.password = password;
         this.studentID = studentID;
+        this.role = role;
+        this.username = username;
     }
 
     public Account() {
 
     }
 
-    public int getId() {
+//    public Account(String user, String password, String user1) {
+//    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -55,5 +62,21 @@ public class Account {
 
     public void setStudentID(String studentID) {
         this.studentID = studentID;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

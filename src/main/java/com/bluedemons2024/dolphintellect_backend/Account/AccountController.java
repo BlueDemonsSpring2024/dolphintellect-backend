@@ -1,6 +1,7 @@
 package com.bluedemons2024.dolphintellect_backend.Account;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,10 +14,10 @@ public class AccountController {
     @Autowired
     AccountRepository accountRepository;
 
-    @GetMapping
-    public List<Account> getAllAccounts(){
-        return accountRepository.findAll();
-    }
+//    @GetMapping
+//    public List<Account> getAllAccounts(){
+//        return accountRepository.findAll();
+//    }
 
     // TODO: Create functions to get user login
 
@@ -34,11 +35,14 @@ public class AccountController {
 
 
 
-//    // Login Account
+
+    // Login Account
 //    @PostMapping("/login")
 //    public void loginAccount(@RequestBody Account account){
 //        accountRepository.findOne(account);
 //    }
+
+
 
 
 
