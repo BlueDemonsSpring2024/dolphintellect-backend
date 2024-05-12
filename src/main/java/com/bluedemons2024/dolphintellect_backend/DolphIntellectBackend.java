@@ -1,7 +1,7 @@
 package com.bluedemons2024.dolphintellect_backend;
 
-import com.bluedemons2024.dolphintellect_backend.Account.Account;
-import com.bluedemons2024.dolphintellect_backend.Account.AccountRepository;
+import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
+import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.config.RSAKeyProperties;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,10 +20,10 @@ public class DolphIntellectBackend {
 
 
 //    @Bean
-//    CommandLineRunner init(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+//    CommandLineRunner init(UserRepistory accountRepository) {
 //        return args -> {
-//            accountRepository.save(new Account("user", "user@sample.com",passwordEncoder.encode("password"),"5gggoin22rgnoin", "USER"));
-//            accountRepository.save(new Account("admin", "admin@sample.com",passwordEncoder.encode("password"),null, "ADMIN"));
+//            accountRepository.save(new UserEntity("user", "user@sample.com","password","5gggoin22rgnoin"));
+//            accountRepository.save(new UserEntity("admin", "admin@sample.com","password",null));
 //
 //        };
 //    }
