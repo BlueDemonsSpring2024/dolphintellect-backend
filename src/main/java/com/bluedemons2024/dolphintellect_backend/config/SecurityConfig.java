@@ -50,11 +50,13 @@ public class SecurityConfig {
 
 
 
+    private JwtAuthEntryPoint authEntryPoint;
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint authEntryPoint) {
         this.userDetailsService = userDetailsService;
+        this.authEntryPoint = authEntryPoint;
     }
 
 
@@ -64,6 +66,12 @@ public class SecurityConfig {
 //        System.out.println("SecurityFilterChain is Running");
          http
                 .csrf().disable()
+                 .exceptionHandling()
+                 .authenticationEntryPoint(authEntryPoint)
+                 .and()
+                 .sessionManagement()
+                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                 .and()
                 .authorizeHttpRequests(authorizeHttpRequests-> authorizeHttpRequests
 //                        .requestMatchers(HttpMethod.GET).authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
