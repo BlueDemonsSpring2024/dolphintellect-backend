@@ -235,6 +235,27 @@ public class StudentController {
     }
 
 
+    @DeleteMapping("enroll-delete-jwt/{id}")
+    public void deleteCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id){
+        System.out.println("deleteCourseEnrollment Route");
+        String studentID = this.getStudentID(authorizationHeader);
+        Optional<Student> student = studentRepository.findById(studentID);
+        List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
+
+
+        //TODO: Delete corresponding grade items
+
+        for(EnrolledCourse enrolledCourse : enrolledCourses){
+            if(enrolledCourse.getId().equals(id)){
+                System.out.println("Deleting enrolled course");
+                enrolledCourses.remove(enrolledCourse);
+                break;
+            }
+        }
+
+        studentRepository.save(student.get());
+
+    }
 
 
     ////////////////////////////
@@ -305,11 +326,11 @@ public class StudentController {
         for(GradeItem gradeItem : gradeItems){
             if(gradeItem.getId().equals(id)){
                 gradeItems.remove(gradeItem);
+                break;
             }
         }
 
         studentRepository.save(student.get());
-
 
     }
 
