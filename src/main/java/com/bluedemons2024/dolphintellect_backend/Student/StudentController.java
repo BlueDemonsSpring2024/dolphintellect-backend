@@ -7,8 +7,8 @@ import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRepository;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseUpdateDTO;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.UpdateEnrolledCourseDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemRepository;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.UpdateGradeItemDTO;
@@ -201,32 +201,30 @@ public class StudentController {
 
     //Successfully update enrollment
     @PutMapping("enroll-update-jwt")
-    public void updateCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseWrapper enrolledCourseWrapper ){
+    public void updateCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UpdateEnrolledCourseDTO updateEnrolledCourseDTO ){
 
         String studentID = this.getStudentID(authorizationHeader);
         Optional<Student> student = studentRepository.findById(studentID);
 
-        EnrolledCourse enrolledCourseToUpdate = enrolledCourseWrapper.getEnrolledCourse();
-
         List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
 
         for(EnrolledCourse enrolledCourse : enrolledCourses){
-            if(enrolledCourse.getId().equals(enrolledCourseToUpdate.getId())){
+            if(enrolledCourse.getId().equals(updateEnrolledCourseDTO.getId())){
 
-                String finalGrade = enrolledCourseToUpdate.getFinalGrade();
-                String term = enrolledCourseToUpdate.getTerm();
-                Integer year = enrolledCourseToUpdate.getYear();
+                Optional<String> finalGrade = updateEnrolledCourseDTO.getFinalGrade();
+                Optional<String> term = updateEnrolledCourseDTO.getTerm();
+                Optional<Integer> year = updateEnrolledCourseDTO.getYear();
 
-                if(finalGrade != null){
-                    enrolledCourse.setFinalGrade(finalGrade);
+                if(finalGrade !=null){
+                    enrolledCourse.setFinalGrade(finalGrade.get());
                 }
 
                 if(term != null){
-                    enrolledCourse.setTerm(term);
+                    enrolledCourse.setTerm(term.get());
                 }
 
                 if(year != null){
-                    enrolledCourse.setYear(year);
+                    enrolledCourse.setYear(year.get());
                 }
 
 
@@ -265,24 +263,15 @@ public class StudentController {
         String studentID = this.getStudentID(authorizationHeader);
         Optional<Student> student = studentRepository.findById(studentID);
 
-//        String courseID = gradeItemWrapper.getCourseID();
-//        Long gradeItemID = gradeItemWrapper.getGradeItem().getId();
         Long gradeItemID = updateGradeItemDTO.getId();
 
         List<GradeItem> gradeItems = student.get().getGradeItems();
 
         for(GradeItem gradeItem : gradeItems){
             if(gradeItem.getId().equals(gradeItemID)){
-                System.out.println("found a match for grade item");
-
                     Optional<String> name = updateGradeItemDTO.getName();
                     Optional<Double> score = updateGradeItemDTO.getScore();
                     Optional<Double> weight = updateGradeItemDTO.getWeight();
-//                Optional<Double> weight = updateGradeItemDTO.getWeight();
-
-
-
-
 
                     if(name != null){
                         gradeItem.setName(name.get());
@@ -296,38 +285,12 @@ public class StudentController {
                         gradeItem.setWeight(weight.get());
                     }
 
-
-//                    if(updateGradeItemDTO.getName() != null){
-//                        gradeItem.setName(updateGradeItemDTO.getName());
-//                    }
-
-
-//                if(gradeItemWrapper.getGradeItem().getName() != null){
-//                    gradeItem.setName(gradeItemWrapper.getGradeItem().getName());
-//                }
-
-
-//                gradeItem.setName();
-//                gradeItem.setScore();
-//                gradeItem.setWeight();
             }
         }
 
-
-
-
         studentRepository.save(student.get());
 
-
-
     }
-
-
-
-
-
-
-
 
 
 
