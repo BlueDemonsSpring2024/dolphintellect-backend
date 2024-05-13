@@ -275,9 +275,31 @@ public class StudentController {
             if(gradeItem.getId().equals(gradeItemID)){
                 System.out.println("found a match for grade item");
 
-                    if(updateGradeItemDTO.getName() != null){
-                        gradeItem.setName(updateGradeItemDTO.getName());
+                    Optional<String> name = updateGradeItemDTO.getName();
+                    Optional<Double> score = updateGradeItemDTO.getScore();
+                    Optional<Double> weight = updateGradeItemDTO.getWeight();
+//                Optional<Double> weight = updateGradeItemDTO.getWeight();
+
+
+
+
+
+                    if(name != null){
+                        gradeItem.setName(name.get());
                     }
+
+                    if(score != null){
+                        gradeItem.setScore(score.get());
+                    }
+
+                    if(weight != null){
+                        gradeItem.setWeight(weight.get());
+                    }
+
+
+//                    if(updateGradeItemDTO.getName() != null){
+//                        gradeItem.setName(updateGradeItemDTO.getName());
+//                    }
 
 
 //                if(gradeItemWrapper.getGradeItem().getName() != null){
