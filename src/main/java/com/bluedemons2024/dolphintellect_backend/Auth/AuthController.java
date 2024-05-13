@@ -5,8 +5,9 @@ import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.RoleRepository;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
+import com.bluedemons2024.dolphintellect_backend.Student.Student;
+import com.bluedemons2024.dolphintellect_backend.Student.StudentRepository;
 import com.bluedemons2024.dolphintellect_backend.config.JWTGenerator;
-//import com.mysql.cj.xdevapi.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import java.util.Collections;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private final StudentRepository studentRepository;
     private AuthenticationManager authenticationManager;
     private UserRepistory userRepistory;
     private RoleRepository roleRepository;
@@ -36,12 +38,13 @@ public class AuthController {
 
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepistory userRepistory, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepistory userRepistory, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator, StudentRepository studentRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepistory = userRepistory;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
+        this.studentRepository = studentRepository;
     }
 
 
@@ -64,8 +67,10 @@ public class AuthController {
         user.setUsername(registerDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
-        //Set student ID
-
+        Student newStudent = new Student();
+        newStudent.setName(registerDto.getStudentName());
+        studentRepository.save(newStudent);
+        user.setStudentID(newStudent.getId());
 
         Role roles = roleRepository.findByName("USER").get();
         user.setRoles(Collections.singletonList(roles));

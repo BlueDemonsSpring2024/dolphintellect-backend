@@ -80,7 +80,7 @@ public class SecurityConfig {
                         .requestMatchers("/courses").permitAll()
                         .requestMatchers("/accounts").permitAll()
 //                        .requestMatchers("/token").anonymous()
-                        .requestMatchers("/students").hasRole("ADMIN")
+                        .requestMatchers("/student/**").permitAll()
 //                        .requestMatchers("/admin").hasRole("ADMIN")
                 )
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

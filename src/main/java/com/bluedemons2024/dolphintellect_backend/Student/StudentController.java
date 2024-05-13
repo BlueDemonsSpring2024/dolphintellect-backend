@@ -8,6 +8,7 @@ import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRe
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
+import com.bluedemons2024.dolphintellect_backend.config.CustomUserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -73,6 +74,10 @@ public class StudentController {
     // Enrolls a specific student in a specific course
     @PostMapping("/enroll")
     public void enrollStudentInCourse(@RequestBody EnrolledCourseWrapper enrolledCourseWrapper){
+
+        System.out.println("CURRENT LOGGED IN STUDENT");
+
+
         String studentID = enrolledCourseWrapper.getStudentID();
         String courseID = enrolledCourseWrapper.getCourseID();
         EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
