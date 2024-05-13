@@ -19,6 +19,7 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -237,19 +238,36 @@ public class StudentController {
 
     @DeleteMapping("enroll-delete-jwt/{id}")
     public void deleteCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id){
-        System.out.println("deleteCourseEnrollment Route");
+//        System.out.println("deleteCourseEnrollment Route");
         String studentID = this.getStudentID(authorizationHeader);
         Optional<Student> student = studentRepository.findById(studentID);
         List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
+        List<GradeItem> gradeItems = student.get().getGradeItems();
 
+        String courseID = null;
 
-        //TODO: Delete corresponding grade items
-
-        for(EnrolledCourse enrolledCourse : enrolledCourses){
-            if(enrolledCourse.getId().equals(id)){
+        Iterator<EnrolledCourse> enrolledCourseIterator = enrolledCourses.iterator();
+        while (enrolledCourseIterator.hasNext()) {
+            EnrolledCourse enrolledCourse = enrolledCourseIterator.next();
+            if (enrolledCourse.getId().equals(id)) {
                 System.out.println("Deleting enrolled course");
-                enrolledCourses.remove(enrolledCourse);
-                break;
+                courseID = enrolledCourse.getCourse().getId();
+                enrolledCourseIterator.remove();
+            }
+        }
+
+
+        // Remove corresponding grade items
+        Iterator<GradeItem> gradeItemIterator = gradeItems.iterator();
+        while (gradeItemIterator.hasNext()) {
+            GradeItem gradeItem = gradeItemIterator.next();
+            System.out.println("++++++++++++++++++++++++++++++");
+            System.out.println("CourseID: " + courseID);
+            System.out.println("GradeItem CourseID: " + gradeItem.getCourse().getId());
+            String gradeItemCourseId = gradeItem.getCourse().getId();
+
+            if (gradeItemCourseId.equals(courseID)) {
+                gradeItemIterator.remove();
             }
         }
 
