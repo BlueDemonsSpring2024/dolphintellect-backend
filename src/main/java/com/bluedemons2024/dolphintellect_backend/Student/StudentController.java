@@ -1,6 +1,8 @@
 package com.bluedemons2024.dolphintellect_backend.Student;
 
 
+import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
+import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
@@ -9,6 +11,11 @@ import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledC
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
 import com.bluedemons2024.dolphintellect_backend.config.CustomUserDetailsService;
+import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -25,11 +32,13 @@ public class StudentController {
     private final StudentRepository studentRepository;
     private final EnrolledCourseRepository enrolledCourseRepository;
     private final CourseRepository courseRepository;
+    private final UserRepistory userRepistory;
 
-    public StudentController(StudentRepository studentRepository, EnrolledCourseRepository enrolledCourseRepository, CourseRepository courseRepository){
+    public StudentController(StudentRepository studentRepository, EnrolledCourseRepository enrolledCourseRepository, CourseRepository courseRepository, UserRepistory userRepistory){
         this.studentRepository = studentRepository;
         this.enrolledCourseRepository = enrolledCourseRepository;
         this.courseRepository = courseRepository;
+        this.userRepistory = userRepistory;
     }
 
 
@@ -40,15 +49,83 @@ public class StudentController {
     }
 
 
-    //TODO: DELETE THIS. ITS ONLY FOR DEVELOPMENT TESTING
-    @GetMapping("/current")
-    public String getCurrentStudent(Principal principal){
-        return "Current " + principal.getName();
+
+//        @GetMapping("/current-user")
+//        public String getCurrentUser(@RequestHeader("Authorization") String authorizationHeader) {
+//            String studentId = null;
+//
+//            String jwtToken = authorizationHeader.substring(7);
+//
+//            Claims claims = Jwts.parser()
+//                    .setSigningKey(SecurityConstants.JWT_SECRET)
+//                    .parseClaimsJws(jwtToken)
+//                    .getBody();
+//
+//            String username = claims.getSubject();
+//
+//             Optional<UserEntity> user = userRepistory.findByUsername(username);
+//
+//             if (user.isPresent()) {
+//                 UserEntity userEntity = user.get();
+//                 studentId = userEntity.getStudentID();
+//             }
+//
+//            return "Current user: " + username + " with id: " + studentId;
+//        }
+
+
+
+    private String getStudentID(String authorizationHeader) {
+        String studentId = null;
+
+        String jwtToken = authorizationHeader.substring(7);
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(SecurityConstants.JWT_SECRET)
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String username = claims.getSubject();
+
+        Optional<UserEntity> user = userRepistory.findByUsername(username);
+
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+            studentId = userEntity.getStudentID();
+        }
+
+        return studentId;
+//        return "Current user: " + username + " with id: " + studentId;
     }
 
 
 
+    //USE THIS ROLE FOR CURRENT STUDENT INFO
+    @GetMapping("info")
+    public Student getStudentInfo(@RequestHeader("Authorization") String authorizationHeader) {
+        String studentID = this.getStudentID(authorizationHeader);
 
+        Optional<Student> data = studentRepository.findById(studentID);
+        Student student = data.orElse(null);
+
+        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
+
+        for(EnrolledCourse enrolledCourse : enrolledCourses){
+            //TEMP!! Move to a better location
+            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(studentID, enrolledCourse.getCourse().getId());
+            enrolledCourse.setGradeItems(gradeItemList);
+
+            double calculatedGrade = enrolledCourse.calculateCourseGrade();
+            enrolledCourse.setCalculatedGrade(calculatedGrade);
+        }
+
+        return student;
+
+
+    }
+
+
+    //TODO: DELETE THIS. NOT NEEDED
     //Get Single Student
     @GetMapping("/id/{id}")
     public Student findById(@PathVariable String id){
@@ -71,6 +148,27 @@ public class StudentController {
 
 
 
+    //Successfully enrolling student with jwt auth
+    @PostMapping("enroll-jwt")
+    public void addCourseToEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseWrapper enrolledCourseWrapper ){
+
+        String studentID = this.getStudentID(authorizationHeader);
+
+        String courseID = enrolledCourseWrapper.getCourseID();
+        EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
+
+        Optional<Student> student = studentRepository.findById(studentID);
+        Optional<Course> course = courseRepository.findById(courseID);
+
+        enrolledCourse.setCourse(course.get());
+        student.get().getEnrolledCourses().add(enrolledCourse);
+        studentRepository.save(student.get());
+
+    }
+
+
+
+    //TODO: DELETE THIS. No Longer needed.
     // Enrolls a specific student in a specific course
     @PostMapping("/enroll")
     public void enrollStudentInCourse(@RequestBody EnrolledCourseWrapper enrolledCourseWrapper){
@@ -163,6 +261,28 @@ public class StudentController {
 
 
 
+
+    @PostMapping("gradeitem-jwt")
+    public void createGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody GradeItemWrapper gradeItemWrapper){
+        String studentID = this.getStudentID(authorizationHeader);
+
+//        String studentID = gradeItemWrapper.getStudentID();
+        String courseID = gradeItemWrapper.getCourseID();
+
+        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
+
+        Optional<Student> student = studentRepository.findById(studentID);
+        Optional<Course> course = courseRepository.findById(courseID);
+
+        gradeItem.setCourse(course.get());
+
+        student.get().setGradeItem(gradeItem);
+        studentRepository.save(student.get());
+
+
+    }
+
+
     //Add a grade item for a course
     @PostMapping("/gradeItem")
     public void addGradeItem(@RequestBody GradeItemWrapper gradeItemWrapper){
@@ -180,6 +300,8 @@ public class StudentController {
         student.get().setGradeItem(gradeItem);
         studentRepository.save(student.get());
     }
+
+
 
 
 }
