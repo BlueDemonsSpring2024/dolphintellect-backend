@@ -235,6 +235,8 @@ public class StudentController {
     }
 
 
+
+
     ////////////////////////////
     //  GRADE ITEMS            //
     ////////////////////////////
@@ -258,6 +260,7 @@ public class StudentController {
     }
 
 
+    //Update Grade Item
     @PutMapping("update-gradeitem-jwt")
     public void updateGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UpdateGradeItemDTO updateGradeItemDTO){
         String studentID = this.getStudentID(authorizationHeader);
@@ -292,6 +295,23 @@ public class StudentController {
 
     }
 
+
+    //Delete a GradeItem
+    @DeleteMapping("delete-gradeitem-jwt/{id}")
+    public void deleteGradeItem(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id ){
+        String studentID = this.getStudentID(authorizationHeader);
+        Optional<Student> student = studentRepository.findById(studentID);
+        List<GradeItem> gradeItems = student.get().getGradeItems();
+        for(GradeItem gradeItem : gradeItems){
+            if(gradeItem.getId().equals(id)){
+                gradeItems.remove(gradeItem);
+            }
+        }
+
+        studentRepository.save(student.get());
+
+
+    }
 
 
 
