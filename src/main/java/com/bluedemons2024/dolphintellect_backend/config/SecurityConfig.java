@@ -43,10 +43,12 @@ public class SecurityConfig {
                         .requestMatchers("/courses").permitAll()
                         .requestMatchers("/accounts").permitAll()
                         .requestMatchers("/student/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
                 )
                 .httpBasic(Customizer.withDefaults());
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(jwtAuthenticationFilter(), Rol)
         return http.build();
     }
 
