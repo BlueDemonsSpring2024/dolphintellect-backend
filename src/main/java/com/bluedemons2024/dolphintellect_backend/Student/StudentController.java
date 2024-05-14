@@ -51,32 +51,6 @@ public class StudentController {
     }
 
 
-
-
-    private String getStudentID(String authorizationHeader) {
-        String studentId = null;
-
-        String jwtToken = authorizationHeader.substring(7);
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_SECRET)
-                .parseClaimsJws(jwtToken)
-                .getBody();
-
-        String username = claims.getSubject();
-
-        Optional<UserEntity> user = userRepistory.findByUsername(username);
-
-        if (user.isPresent()) {
-            UserEntity userEntity = user.get();
-            studentId = userEntity.getStudentID();
-        }
-
-        return studentId;
-    }
-
-
-
     //USE THIS ROLE FOR CURRENT STUDENT INFO
     @GetMapping("info")
     public Student getStudentInfo(@RequestHeader("Authorization") String authorizationHeader) {
@@ -99,78 +73,6 @@ public class StudentController {
         return student;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-    //SingleStudent get enrolled courses
-//    @GetMapping("/{id}/enrolledcourses")
-//    public List<EnrolledCourse> findEnrolledCoursesByStudentID(@PathVariable String id){
-//        System.out.println("Looking for ENROLLED COURSE FOR STUDENT TEST");
-//
-//        return studentRepository.findById(id).get().getEnrolledCourses();
-//
-//    }
-
-
-//    @GetMapping(value = "/{id}/enrolledcourses", params = {"year"})
-//    public List<EnrolledCourse>findEnrolledCoursesForYearByStudentID(@PathVariable String id, @RequestParam(required = false) int year){
-//        List<EnrolledCourse> ec = studentRepository.findById(id).get().getEnrolledCourses();
-//        List<EnrolledCourse> courseList = new ArrayList<>();
-//        for(EnrolledCourse e: ec){
-//            if(e.getYear() == year){
-//                courseList.add(e);
-//            }
-//        }
-//        return courseList;
-//    }
-
-
-    //Create Student
-    @PostMapping
-    public void addStudent(@RequestBody Student newStudent){
-        System.out.println(newStudent.getName());
-        studentRepository.save(newStudent);
-    }
-
-
-    //Delete A Student
-    @DeleteMapping
-    public void deleteStudent(@RequestParam String id){
-        studentRepository.deleteById(id);
-    }
-
-
-    @DeleteMapping("/id/{id}")
-    public void getStudentByID(@PathVariable String id) {
-        studentRepository.deleteById(id);
-    }
-
-
-
-
-    //TODO: get grade items for a specific course
-    public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
-        List<GradeItem> gradeItems = studentRepository.findById(studentID).get().getGradeItems();
-        List<GradeItem> gradeItemsListForCourse = new ArrayList<>();
-
-        for(GradeItem gradeItem : gradeItems){
-            String courseIDForGradeItem = gradeItem.getCourse().getId();
-            if(courseID.equals(courseIDForGradeItem)){
-                gradeItemsListForCourse.add(gradeItem);
-            }
-        }
-
-        return gradeItemsListForCourse;
-    }
-
 
 
 
@@ -352,74 +254,169 @@ public class StudentController {
 
     }
 
+    ////////////////////////////
+    //  Helpers               //
+    ////////////////////////////
+
+    //TODO: get grade items for a specific course
+    public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
+        List<GradeItem> gradeItems = studentRepository.findById(studentID).get().getGradeItems();
+        List<GradeItem> gradeItemsListForCourse = new ArrayList<>();
+
+        for(GradeItem gradeItem : gradeItems){
+            String courseIDForGradeItem = gradeItem.getCourse().getId();
+            if(courseID.equals(courseIDForGradeItem)){
+                gradeItemsListForCourse.add(gradeItem);
+            }
+        }
+
+        return gradeItemsListForCourse;
+    }
+
+
+    private String getStudentID(String authorizationHeader) {
+        String studentId = null;
+
+        String jwtToken = authorizationHeader.substring(7);
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(SecurityConstants.JWT_SECRET)
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String username = claims.getSubject();
+
+        Optional<UserEntity> user = userRepistory.findByUsername(username);
+
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+            studentId = userEntity.getStudentID();
+        }
+
+        return studentId;
+    }
+
+
+
+
+
+
 
 
     ////////////////////////////
     //  NO LONGER NEEDED       //
     ////////////////////////////
 
+//
+//    //TODO: DELETE NO Longer Needed
+//    //Add a grade item for a course
+//    @PostMapping("/gradeItem")
+//    public void addGradeItem(@RequestBody GradeItemWrapper gradeItemWrapper){
+//
+//        String studentID = gradeItemWrapper.getStudentID();
+//        String courseID = gradeItemWrapper.getCourseID();
+//
+//        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
+//
+//        Optional<Student> student = studentRepository.findById(studentID);
+//        Optional<Course> course = courseRepository.findById(courseID);
+//
+//        gradeItem.setCourse(course.get());
+//
+//        student.get().setGradeItem(gradeItem);
+//        studentRepository.save(student.get());
+//    }
+//
+//
+//    //TODO: DELETE THIS. No Longer needed.
+//    // Enrolls a specific student in a specific course
+//    @PostMapping("/enroll")
+//    public void enrollStudentInCourse(@RequestBody EnrolledCourseWrapper enrolledCourseWrapper){
+//
+//        System.out.println("CURRENT LOGGED IN STUDENT");
+//
+//
+//        String studentID = enrolledCourseWrapper.getStudentID();
+//        String courseID = enrolledCourseWrapper.getCourseID();
+//        EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
+//
+//        Optional<Student> student = studentRepository.findById(studentID);
+//        Optional<Course> course = courseRepository.findById(courseID);
+//
+//        enrolledCourse.setCourse(course.get());
+//        student.get().getEnrolledCourses().add(enrolledCourse);
+//        studentRepository.save(student.get());
+//    }
+//
+//
+//    //TODO: DELETE THIS. NOT NEEDED
+//    //Get Single Student
+//    @GetMapping("/id/{id}")
+//    public Student findById(@PathVariable String id){
+//        Optional<Student> data = studentRepository.findById(id);
+//        Student student = data.orElse(null);
+//
+//        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
+//
+//        for(EnrolledCourse enrolledCourse : enrolledCourses){
+//            //TEMP!! Move to a better location
+//            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(id, enrolledCourse.getCourse().getId());
+//            enrolledCourse.setGradeItems(gradeItemList);
+//
+//            double calculatedGrade = enrolledCourse.calculateCourseGrade();
+//            enrolledCourse.setCalculatedGrade(calculatedGrade);
+//        }
+//
+//        return student;
+//    }
+//
+//
 
-    //TODO: DELETE NO Longer Needed
-    //Add a grade item for a course
-    @PostMapping("/gradeItem")
-    public void addGradeItem(@RequestBody GradeItemWrapper gradeItemWrapper){
-
-        String studentID = gradeItemWrapper.getStudentID();
-        String courseID = gradeItemWrapper.getCourseID();
-
-        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
-
-        Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
-
-        gradeItem.setCourse(course.get());
-
-        student.get().setGradeItem(gradeItem);
-        studentRepository.save(student.get());
-    }
+    //SingleStudent get enrolled courses
+//    @GetMapping("/{id}/enrolledcourses")
+//    public List<EnrolledCourse> findEnrolledCoursesByStudentID(@PathVariable String id){
+//        System.out.println("Looking for ENROLLED COURSE FOR STUDENT TEST");
+//
+//        return studentRepository.findById(id).get().getEnrolledCourses();
+//
+//    }
 
 
-    //TODO: DELETE THIS. No Longer needed.
-    // Enrolls a specific student in a specific course
-    @PostMapping("/enroll")
-    public void enrollStudentInCourse(@RequestBody EnrolledCourseWrapper enrolledCourseWrapper){
-
-        System.out.println("CURRENT LOGGED IN STUDENT");
-
-
-        String studentID = enrolledCourseWrapper.getStudentID();
-        String courseID = enrolledCourseWrapper.getCourseID();
-        EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
-
-        Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
-
-        enrolledCourse.setCourse(course.get());
-        student.get().getEnrolledCourses().add(enrolledCourse);
-        studentRepository.save(student.get());
-    }
+//    @GetMapping(value = "/{id}/enrolledcourses", params = {"year"})
+//    public List<EnrolledCourse>findEnrolledCoursesForYearByStudentID(@PathVariable String id, @RequestParam(required = false) int year){
+//        List<EnrolledCourse> ec = studentRepository.findById(id).get().getEnrolledCourses();
+//        List<EnrolledCourse> courseList = new ArrayList<>();
+//        for(EnrolledCourse e: ec){
+//            if(e.getYear() == year){
+//                courseList.add(e);
+//            }
+//        }
+//        return courseList;
+//    }
 
 
-    //TODO: DELETE THIS. NOT NEEDED
-    //Get Single Student
-    @GetMapping("/id/{id}")
-    public Student findById(@PathVariable String id){
-        Optional<Student> data = studentRepository.findById(id);
-        Student student = data.orElse(null);
 
-        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
 
-        for(EnrolledCourse enrolledCourse : enrolledCourses){
-            //TEMP!! Move to a better location
-            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(id, enrolledCourse.getCourse().getId());
-            enrolledCourse.setGradeItems(gradeItemList);
 
-            double calculatedGrade = enrolledCourse.calculateCourseGrade();
-            enrolledCourse.setCalculatedGrade(calculatedGrade);
-        }
+//    //Create Student
+//    @PostMapping
+//    public void addStudent(@RequestBody Student newStudent){
+//        System.out.println(newStudent.getName());
+//        studentRepository.save(newStudent);
+//    }
 
-        return student;
-    }
+
+//    //Delete A Student
+//    @DeleteMapping
+//    public void deleteStudent(@RequestParam String id){
+//        studentRepository.deleteById(id);
+//    }
+
+
+//    @DeleteMapping("/id/{id}")
+//    public void getStudentByID(@PathVariable String id) {
+//        studentRepository.deleteById(id);
+//    }
 
 
 

@@ -16,10 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
@@ -57,6 +54,7 @@ public class AuthController {
     }
 
 
+    //Used to Register A Student
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
         if(userRepistory.existsByUsername(registerDto.getUsername())) {
@@ -79,4 +77,32 @@ public class AuthController {
 
         return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
     }
+
+
+    //Delete a student
+    @DeleteMapping("deleteStudent/{id}")
+    public ResponseEntity<String> deleteStudent(@PathVariable long id) {
+
+        if (!userRepistory.existsById(id)){
+            return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
+        }
+
+        //get the user
+        UserEntity user = userRepistory.findById(id).get();
+
+        //get the student id
+        String studentID = user.getStudentID();
+
+        //delete the student id from neo4j
+        studentRepository.deleteById(studentID);
+
+        // delete the user roles
+        userRepistory.deleteAllById(Collections.singleton(id));
+
+        //delete the user from accounts
+        userRepistory.deleteById(id);
+        return new ResponseEntity<>("User Deleted successfully!", HttpStatus.OK);
+    }
+
+
 }
