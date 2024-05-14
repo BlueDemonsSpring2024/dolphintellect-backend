@@ -11,8 +11,4 @@ public interface CourseRepository extends Neo4jRepository<Course, String> {
     List<Course> findCoursesBySubject(String subject);
     List<Course> findCoursesByNumber(int number);
     Course findCourseBySubjectAndNumber(String subject, int number);
-//    void deleteCourseBySubjectAndNumber(String subject, int number);
-//    Void updateCourseByDescription();
-//    void updateCourseBySubjectAndNumber(String subject, int number);
-//    void update
 }
