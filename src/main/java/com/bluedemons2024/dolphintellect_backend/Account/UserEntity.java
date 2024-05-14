@@ -81,14 +81,6 @@ public class UserEntity {
         this.studentID = studentID;
     }
 
-//    public String getRole() {
-//        return role;
-//    }
-
-//    public void setRole(String role) {
-//        this.role = role;
-//    }
-
     public String getUsername() {
         return username;
     }

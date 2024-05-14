@@ -36,6 +36,8 @@ public class Student {
         this.name = name;
     }
 
+    public Student() {}
+
     public EnrolledCourse isEnrolledIn(Course course, EnrolledCourse enrolledCourse){
 //        EnrolledCourse enrolledCourse
         this.enrolledCourses.add(enrolledCourse);
