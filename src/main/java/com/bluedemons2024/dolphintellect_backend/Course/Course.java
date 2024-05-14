@@ -1,7 +1,5 @@
 package com.bluedemons2024.dolphintellect_backend.Course;
 
-//Should be a neo4j node
-
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
