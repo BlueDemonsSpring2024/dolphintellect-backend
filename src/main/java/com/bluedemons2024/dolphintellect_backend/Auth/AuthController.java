@@ -54,6 +54,33 @@ public class AuthController {
     }
 
 
+
+    //Used to Register A Student
+    @PostMapping("registerAdmin")
+    public ResponseEntity<String> registerAdmin(@RequestBody RegisterDto registerDto) {
+        if(userRepistory.existsByUsername(registerDto.getUsername())) {
+            return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity user = new UserEntity();
+        user.setUsername(registerDto.getUsername());
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+
+        user.setStudentID(null);
+
+        Role roles = roleRepository.findByName("ADMIN").get();
+        user.setRoles(Collections.singletonList(roles));
+
+        userRepistory.save(user);
+
+        return new ResponseEntity<>("Admin User registered successfully!", HttpStatus.OK);
+    }
+
+
+
+
+
+
     //Used to Register A Student
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {

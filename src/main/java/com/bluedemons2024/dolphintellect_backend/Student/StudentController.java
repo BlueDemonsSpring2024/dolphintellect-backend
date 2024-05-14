@@ -1,6 +1,7 @@
 package com.bluedemons2024.dolphintellect_backend.Student;
 
 
+import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
@@ -16,6 +17,7 @@ import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapp
 import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -45,8 +47,23 @@ public class StudentController {
 
 
     //Get All Students
-    @GetMapping
-    public List<Student> findAll(){
+//    @GetMapping("all")
+//    public List<Student> findAll(@RequestHeader("Authorization") String authorizationHeader){
+//
+//        List<Role> roles = this.getUserRoles(authorizationHeader);
+//
+//        for (Role role : roles) {
+//            if (role.getName().equals("ADMIN")){
+//                System.out.println("THIS IS AN ADMIN ROLE");
+//                return studentRepository.findAll();
+//            }
+//        }
+//
+//        return new ArrayList<>();
+//    }
+
+    @GetMapping("all")
+    public List<Student> findAll(@RequestHeader("Authorization") String authorizationHeader){
         return studentRepository.findAll();
     }
 
@@ -295,6 +312,31 @@ public class StudentController {
 
         return studentId;
     }
+
+    private List<Role> getUserRoles(String authorizationHeader) {
+//        String studentId = null;
+        List<Role> roles = new ArrayList<>();
+
+        String jwtToken = authorizationHeader.substring(7);
+
+        Claims claims = Jwts.parser()
+                .setSigningKey(SecurityConstants.JWT_SECRET)
+                .parseClaimsJws(jwtToken)
+                .getBody();
+
+        String username = claims.getSubject();
+
+        Optional<UserEntity> user = userRepistory.findByUsername(username);
+
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+            roles = userEntity.getRoles();
+//            studentId = userEntity.getStudentID();
+        }
+
+        return roles;
+    }
+
 
 
 
