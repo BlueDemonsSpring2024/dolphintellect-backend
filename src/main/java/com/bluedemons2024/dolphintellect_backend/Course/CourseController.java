@@ -60,8 +60,6 @@ public class CourseController {
     //create a new course
     @PostMapping
     public void addCourse(@RequestBody Course newCourse){
-        System.out.println("adding course");
-        System.out.println(newCourse.getTitle());
         courseRepository.save(newCourse);
     }
 
