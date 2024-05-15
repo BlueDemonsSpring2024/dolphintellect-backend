@@ -1,4 +1,4 @@
-package com.bluedemons2024.dolphintellect_backend.config;
+package com.bluedemons2024.dolphintellect_backend.Security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

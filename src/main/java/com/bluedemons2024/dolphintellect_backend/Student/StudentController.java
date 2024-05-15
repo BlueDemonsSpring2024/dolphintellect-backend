@@ -13,7 +13,7 @@ import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemRepository;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.UpdateGradeItemDTO;
-import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
+import com.bluedemons2024.dolphintellect_backend.Security.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.web.bind.annotation.*;
