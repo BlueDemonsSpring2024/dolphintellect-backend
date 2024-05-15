@@ -7,12 +7,12 @@ import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRepository;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseDTO;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.UpdateEnrolledCourseDTO;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseDTO;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.UpdateEnrolledCourseDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
+import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemRepository;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.UpdateGradeItemDTO;
-import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
 import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -197,21 +197,43 @@ public class StudentController {
 
     //SUCCESSFULLY WORKING WITH JWT
     @PostMapping("gradeitem-jwt")
-    public void createGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody GradeItemWrapper gradeItemWrapper){
+    public void createGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody GradeItemDTO gradeItemDTO){
         String studentID = this.getStudentID(authorizationHeader);
 
-        String courseID = gradeItemWrapper.getCourseID();
 
-        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
+
+        Optional<String> courseID = gradeItemDTO.getCourseID();
+
+        Optional<String> name = gradeItemDTO.getName();
+
+        Optional<Double> score = gradeItemDTO.getScore();
+
+        Optional<Double> weight = gradeItemDTO.getWeight();
+
+        GradeItem gradeItem = new GradeItem();
+
+        if(name != null){
+            gradeItem.setName(name.get());
+        }
+
+        if(score != null){
+            gradeItem.setScore(score.get());
+        }
+
+        if(weight != null){
+            gradeItem.setWeight(weight.get());
+        }
+
 
         Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
+        Optional<Course> course = courseRepository.findById(courseID.get());
 
         gradeItem.setCourse(course.get());
 
         student.get().setGradeItem(gradeItem);
         studentRepository.save(student.get());
     }
+
 
 
     //Update Grade Item
