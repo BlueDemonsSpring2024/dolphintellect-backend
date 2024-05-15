@@ -68,7 +68,7 @@ class StudentTest {
 
     @Test
     void isEnrolledIn() {
-        student.isEnrolledIn(course,enrolledCourse);
+        student.isEnrolledIn(enrolledCourse);
         assertEquals(1,enrolledCourses.size());
     }
 
