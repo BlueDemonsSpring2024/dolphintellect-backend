@@ -11,7 +11,6 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 public class GradeItem {
 
     @Id
-//    @GeneratedValue(UUIDStringGenerator.class)
     @GeneratedValue
     private Long id;
 

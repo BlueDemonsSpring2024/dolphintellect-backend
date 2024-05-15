@@ -1,8 +1,5 @@
-package com.bluedemons2024.dolphintellect_backend.config;
+package com.bluedemons2024.dolphintellect_backend.Account;
 
-import com.bluedemons2024.dolphintellect_backend.Account.Role;
-import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
-import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

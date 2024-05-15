@@ -7,7 +7,7 @@ import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Student.Student;
 import com.bluedemons2024.dolphintellect_backend.Student.StudentRepository;
-import com.bluedemons2024.dolphintellect_backend.config.JWTGenerator;
+import com.bluedemons2024.dolphintellect_backend.Security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,24 +1,18 @@
 package com.bluedemons2024.dolphintellect_backend.Student;
 
-
-import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRepository;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.UpdateEnrolledCourseDTO;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseDTO;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.UpdateEnrolledCourseDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
-import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemRepository;
+import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.UpdateGradeItemDTO;
-import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapper;
-import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
+import com.bluedemons2024.dolphintellect_backend.Security.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,25 +22,17 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/student")
-
-@SuppressWarnings("deprecation")
 public class StudentController {
 
     private final StudentRepository studentRepository;
-    private final EnrolledCourseRepository enrolledCourseRepository;
     private final CourseRepository courseRepository;
     private final UserRepistory userRepistory;
-    private final GradeItemRepository gradeItemRepository;
 
-    public StudentController(StudentRepository studentRepository, EnrolledCourseRepository enrolledCourseRepository, CourseRepository courseRepository, UserRepistory userRepistory, GradeItemRepository gradeItemRepository){
+    public StudentController(StudentRepository studentRepository, CourseRepository courseRepository, UserRepistory userRepistory){
         this.studentRepository = studentRepository;
-        this.enrolledCourseRepository = enrolledCourseRepository;
         this.courseRepository = courseRepository;
         this.userRepistory = userRepistory;
-        this.gradeItemRepository = gradeItemRepository;
     }
-
-
 
     @GetMapping("all")
     public List<Student> findAll(){
@@ -55,124 +41,174 @@ public class StudentController {
 
 
     //USE THIS ROLE FOR CURRENT STUDENT INFO
-    @GetMapping("info")
+    @GetMapping()
     public Student getStudentInfo(@RequestHeader("Authorization") String authorizationHeader) {
         String studentID = this.getStudentID(authorizationHeader);
 
         Optional<Student> data = studentRepository.findById(studentID);
         Student student = data.orElse(null);
 
-        List<EnrolledCourse> enrolledCourses = student.getEnrolledCourses();
+        List<EnrolledCourse> enrolledCourses = null;
 
-        for(EnrolledCourse enrolledCourse : enrolledCourses){
-            List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(studentID, enrolledCourse.getCourse().getId());
-            enrolledCourse.setGradeItems(gradeItemList);
+        if (student != null) {
+            enrolledCourses = student.getEnrolledCourses();
+        }
 
-            double calculatedGrade = enrolledCourse.calculateCourseGrade();
-            enrolledCourse.setCalculatedGrade(calculatedGrade);
+        if (enrolledCourses != null) {
+            for(EnrolledCourse enrolledCourse : enrolledCourses){
+                List<GradeItem> gradeItemList = this.getGradeItemsForStudentByCourse(studentID, enrolledCourse.getCourse().getId());
+                enrolledCourse.setGradeItems(gradeItemList);
+
+                double calculatedGrade = enrolledCourse.calculateCourseGrade();
+                enrolledCourse.setCalculatedGrade(calculatedGrade);
+            }
         }
 
         return student;
 
     }
 
-
-
     ////////////////////////////
     //  ENROLLED COURSE       //
     ////////////////////////////
 
-    //Successfully enrolling student with jwt auth
-    @PostMapping("enroll-jwt")
-    public void addCourseToEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseWrapper enrolledCourseWrapper ){
+
+    @PostMapping("enrolled-course")
+    public void addCourseToEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseDTO enrolledCourseDTO ){
+        EnrolledCourse enrolledCourse = new EnrolledCourse();
+        Student student = null;
+        Course course = null;
 
         String studentID = this.getStudentID(authorizationHeader);
-
-        String courseID = enrolledCourseWrapper.getCourseID();
-        EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
-
-        Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
-
-        enrolledCourse.setCourse(course.get());
-        student.get().getEnrolledCourses().add(enrolledCourse);
-        studentRepository.save(student.get());
-
-    }
+        Optional<Student> studentOptional = studentRepository.findById(studentID);
+        if(studentOptional.isPresent()){
+            student = studentOptional.get();
+        }
 
 
-    //Successfully update enrollment
-    @PutMapping("enroll-update-jwt")
-    public void updateCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UpdateEnrolledCourseDTO updateEnrolledCourseDTO ){
+        Optional<String> courseIDOptional = enrolledCourseDTO.getCourseID();
+        if(courseIDOptional.isPresent()){
+            Optional<Course> courseOptional = courseRepository.findById(courseIDOptional.get());
 
-        String studentID = this.getStudentID(authorizationHeader);
-        Optional<Student> student = studentRepository.findById(studentID);
-
-        List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
-
-        for(EnrolledCourse enrolledCourse : enrolledCourses){
-            if(enrolledCourse.getId().equals(updateEnrolledCourseDTO.getId())){
-
-                Optional<String> finalGrade = updateEnrolledCourseDTO.getFinalGrade();
-                Optional<String> term = updateEnrolledCourseDTO.getTerm();
-                Optional<Integer> year = updateEnrolledCourseDTO.getYear();
-
-                if(finalGrade !=null){
-                    enrolledCourse.setFinalGrade(finalGrade.get());
-                }
-
-                if(term != null){
-                    enrolledCourse.setTerm(term.get());
-                }
-
-                if(year != null){
-                    enrolledCourse.setYear(year.get());
-                }
-
-
+            if(courseOptional.isPresent()){
+                course = courseOptional.get();
             }
         }
 
-        studentRepository.save(student.get());
+        enrolledCourse.setCourse(course);
+
+        Optional<String> term = enrolledCourseDTO.getTerm();
+        term.ifPresent(enrolledCourse::setTerm);
+
+        Optional<Integer> year = enrolledCourseDTO.getYear();
+        year.ifPresent(enrolledCourse::setYear);
+
+        Optional<Integer> credits = enrolledCourseDTO.getCredits();
+        credits.ifPresent(enrolledCourse::setCredits);
+
+        Optional<String> finalGrade = enrolledCourseDTO.getFinalGrade();
+        finalGrade.ifPresent(enrolledCourse::setFinalGrade);
+
+
+        if (student != null) {
+            student.getEnrolledCourses().add(enrolledCourse);
+            studentRepository.save(student);
+        }
+
+    }
+
+    //Successfully update enrollment
+    @PutMapping("enrolled-course")
+    public void updateCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UpdateEnrolledCourseDTO updateEnrolledCourseDTO ){
+
+        String studentID = this.getStudentID(authorizationHeader);
+        Optional<Student> studentOptional = studentRepository.findById(studentID);
+        Student student = studentOptional.orElse(null);
+
+        List<EnrolledCourse> enrolledCourses = null;
+        if (student != null) {
+            enrolledCourses = student.getEnrolledCourses();
+        }
+
+        if (enrolledCourses != null) {
+            for(EnrolledCourse enrolledCourse : enrolledCourses){
+                if(enrolledCourse.getId().equals(updateEnrolledCourseDTO.getId())){
+
+                    Optional<String> finalGrade = updateEnrolledCourseDTO.getFinalGrade();
+                    finalGrade.ifPresent(enrolledCourse::setFinalGrade);
+
+                    Optional<String> term = updateEnrolledCourseDTO.getTerm();
+                    term.ifPresent(enrolledCourse::setTerm);
+
+                    Optional<Integer> year = updateEnrolledCourseDTO.getYear();
+                    year.ifPresent(enrolledCourse::setYear);
+
+                }
+            }
+        }
+
+        if (student != null) {
+            studentRepository.save(student);
+        }
     }
 
 
-    @DeleteMapping("enroll-delete-jwt/{id}")
+    @DeleteMapping("enrolled-course/{id}")
     public void deleteCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id){
-//        System.out.println("deleteCourseEnrollment Route");
         String studentID = this.getStudentID(authorizationHeader);
-        Optional<Student> student = studentRepository.findById(studentID);
-        List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
-        List<GradeItem> gradeItems = student.get().getGradeItems();
+        Optional<Student> studentOptional = studentRepository.findById(studentID);
+        Student student = studentOptional.orElse(null);
+
+        List<EnrolledCourse> enrolledCourses = null;
+        if (student != null) {
+            enrolledCourses = student.getEnrolledCourses();
+        }
+
+        List<GradeItem> gradeItems = null;
+        if (student != null) {
+            gradeItems = student.getGradeItems();
+        }
 
         String courseID = null;
 
-        Iterator<EnrolledCourse> enrolledCourseIterator = enrolledCourses.iterator();
-        while (enrolledCourseIterator.hasNext()) {
-            EnrolledCourse enrolledCourse = enrolledCourseIterator.next();
-            if (enrolledCourse.getId().equals(id)) {
-                System.out.println("Deleting enrolled course");
-                courseID = enrolledCourse.getCourse().getId();
-                enrolledCourseIterator.remove();
+        Iterator<EnrolledCourse> enrolledCourseIterator = null;
+        if (enrolledCourses != null) {
+            enrolledCourseIterator = enrolledCourses.iterator();
+        }
+        if (enrolledCourseIterator != null) {
+            while (enrolledCourseIterator.hasNext()) {
+                EnrolledCourse enrolledCourse = enrolledCourseIterator.next();
+                if (enrolledCourse.getId().equals(id)) {
+                    System.out.println("Deleting enrolled course");
+                    courseID = enrolledCourse.getCourse().getId();
+                    enrolledCourseIterator.remove();
+                }
             }
         }
 
 
         // Remove corresponding grade items
-        Iterator<GradeItem> gradeItemIterator = gradeItems.iterator();
-        while (gradeItemIterator.hasNext()) {
-            GradeItem gradeItem = gradeItemIterator.next();
-            System.out.println("++++++++++++++++++++++++++++++");
-            System.out.println("CourseID: " + courseID);
-            System.out.println("GradeItem CourseID: " + gradeItem.getCourse().getId());
-            String gradeItemCourseId = gradeItem.getCourse().getId();
+        Iterator<GradeItem> gradeItemIterator = null;
+        if (gradeItems != null) {
+            gradeItemIterator = gradeItems.iterator();
+        }
+        if (gradeItemIterator != null) {
+            while (gradeItemIterator.hasNext()) {
+                GradeItem gradeItem = gradeItemIterator.next();
+                System.out.println("++++++++++++++++++++++++++++++");
+                System.out.println("CourseID: " + courseID);
+                System.out.println("GradeItem CourseID: " + gradeItem.getCourse().getId());
+                String gradeItemCourseId = gradeItem.getCourse().getId();
 
-            if (gradeItemCourseId.equals(courseID)) {
-                gradeItemIterator.remove();
+                if (gradeItemCourseId.equals(courseID)) {
+                    gradeItemIterator.remove();
+                }
             }
         }
 
-        studentRepository.save(student.get());
+        if (student != null) {
+            studentRepository.save(student);
+        }
 
     }
 
@@ -182,74 +218,102 @@ public class StudentController {
     ////////////////////////////
 
     //SUCCESSFULLY WORKING WITH JWT
-    @PostMapping("gradeitem-jwt")
-    public void createGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody GradeItemWrapper gradeItemWrapper){
+    @PostMapping("grade-item")
+    public void createGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody GradeItemDTO gradeItemDTO){
+        GradeItem gradeItem = new GradeItem();
+
         String studentID = this.getStudentID(authorizationHeader);
+        Student student = studentRepository.findById(studentID).orElse(null);
 
-        String courseID = gradeItemWrapper.getCourseID();
+        Course course = null;
+        Optional<String> courseIDOptional = gradeItemDTO.getCourseID();
+        if (courseIDOptional.isPresent()) {
+            Optional<Course> courseOptional = courseRepository.findById(courseIDOptional.get());
+            course = courseOptional.orElse(null);
+            System.out.println("Course Title: " + course.getTitle());
+        }
 
-        GradeItem gradeItem = gradeItemWrapper.getGradeItem();
+        Optional<String> name = gradeItemDTO.getName();
+        name.ifPresent(gradeItem::setName);
 
-        Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
+        Optional<Double> score = gradeItemDTO.getScore();
+        score.ifPresent(gradeItem::setScore);
 
-        gradeItem.setCourse(course.get());
+        Optional<Double> weight = gradeItemDTO.getWeight();
+        weight.ifPresent(gradeItem::setWeight);
 
-        student.get().setGradeItem(gradeItem);
-        studentRepository.save(student.get());
+        gradeItem.setCourse(course);
+
+        if (student != null) {
+            student.setGradeItem(gradeItem);
+            studentRepository.save(student);
+        }
+
     }
 
 
+
     //Update Grade Item
-    @PutMapping("update-gradeitem-jwt")
+    @PutMapping("grade-item")
     public void updateGradeItem(@RequestHeader("Authorization") String authorizationHeader, @RequestBody UpdateGradeItemDTO updateGradeItemDTO){
         String studentID = this.getStudentID(authorizationHeader);
-        Optional<Student> student = studentRepository.findById(studentID);
+        Optional<Student> studentOptional = studentRepository.findById(studentID);
+        Student student = studentOptional.orElse(null);
 
         Long gradeItemID = updateGradeItemDTO.getId();
 
-        List<GradeItem> gradeItems = student.get().getGradeItems();
+        List<GradeItem> gradeItems = null;
+        if (student != null) {
+            gradeItems = student.getGradeItems();
+        }
 
-        for(GradeItem gradeItem : gradeItems){
-            if(gradeItem.getId().equals(gradeItemID)){
-                    Optional<String> name = updateGradeItemDTO.getName();
-                    Optional<Double> score = updateGradeItemDTO.getScore();
-                    Optional<Double> weight = updateGradeItemDTO.getWeight();
+        if (gradeItems != null) {
+            for(GradeItem gradeItem : gradeItems){
+                if(gradeItem.getId().equals(gradeItemID)){
+                        Optional<String> name = updateGradeItemDTO.getName();
+                        name.ifPresent(gradeItem::setName);
 
-                    if(name != null){
-                        gradeItem.setName(name.get());
-                    }
+                        Optional<Double> score = updateGradeItemDTO.getScore();
+                        score.ifPresent(gradeItem::setScore);
 
-                    if(score != null){
-                        gradeItem.setScore(score.get());
-                    }
+                        Optional<Double> weight = updateGradeItemDTO.getWeight();
+                        weight.ifPresent(gradeItem::setWeight);
 
-                    if(weight != null){
-                        gradeItem.setWeight(weight.get());
-                    }
-
+                }
             }
         }
 
-        studentRepository.save(student.get());
+        if (student != null) {
+            studentRepository.save(student);
+        }
 
     }
 
 
     //Delete a GradeItem
-    @DeleteMapping("delete-gradeitem-jwt/{id}")
+    @DeleteMapping("grade-item/{id}")
     public void deleteGradeItem(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id ){
         String studentID = this.getStudentID(authorizationHeader);
-        Optional<Student> student = studentRepository.findById(studentID);
-        List<GradeItem> gradeItems = student.get().getGradeItems();
-        for(GradeItem gradeItem : gradeItems){
-            if(gradeItem.getId().equals(id)){
-                gradeItems.remove(gradeItem);
-                break;
+        Optional<Student> studentOptional = studentRepository.findById(studentID);
+        Student student = studentOptional.orElse(null);
+
+        List<GradeItem> gradeItems = null;
+        if (student != null) {
+            gradeItems = student.getGradeItems();
+        }
+
+        if (gradeItems != null) {
+            for(GradeItem gradeItem : gradeItems){
+                if(gradeItem.getId().equals(id)){
+                    gradeItems.remove(gradeItem);
+                    break;
+                }
             }
         }
 
-        studentRepository.save(student.get());
+        if (student != null) {
+            studentRepository.save(student);
+        }
 
     }
 
@@ -257,15 +321,22 @@ public class StudentController {
     //  Helpers               //
     ////////////////////////////
 
-    //TODO: get grade items for a specific course
+
     public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
-        List<GradeItem> gradeItems = studentRepository.findById(studentID).get().getGradeItems();
+        Student student = studentRepository.findById(studentID).orElse(null);
+
+        List<GradeItem> gradeItems = null;
+        if (student != null) {
+            gradeItems = student.getGradeItems();
+        }
         List<GradeItem> gradeItemsListForCourse = new ArrayList<>();
 
-        for(GradeItem gradeItem : gradeItems){
-            String courseIDForGradeItem = gradeItem.getCourse().getId();
-            if(courseID.equals(courseIDForGradeItem)){
-                gradeItemsListForCourse.add(gradeItem);
+        if (gradeItems != null) {
+            for(GradeItem gradeItem : gradeItems){
+                String courseIDForGradeItem = gradeItem.getCourse().getId();
+                if(courseID.equals(courseIDForGradeItem)){
+                    gradeItemsListForCourse.add(gradeItem);
+                }
             }
         }
 
@@ -294,28 +365,5 @@ public class StudentController {
 
         return studentId;
     }
-
-    private List<Role> getUserRoles(String authorizationHeader) {
-        List<Role> roles = new ArrayList<>();
-
-        String jwtToken = authorizationHeader.substring(7);
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_SECRET)
-                .parseClaimsJws(jwtToken)
-                .getBody();
-
-        String username = claims.getSubject();
-
-        Optional<UserEntity> user = userRepistory.findByUsername(username);
-
-        if (user.isPresent()) {
-            UserEntity userEntity = user.get();
-            roles = userEntity.getRoles();
-        }
-
-        return roles;
-    }
-
 
 }

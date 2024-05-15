@@ -2,16 +2,13 @@ package com.bluedemons2024.dolphintellect_backend.EnrolledCourse;
 
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
-import com.bluedemons2024.dolphintellect_backend.Student.Student;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
 import java.util.List;
-import java.util.Optional;
 
-@SuppressWarnings("deprecation")
 @RelationshipProperties
 public class EnrolledCourse {
 
@@ -50,23 +47,15 @@ public class EnrolledCourse {
         List<GradeItem> gradeItems = this.gradeItems;
 
         for(GradeItem gradeItem : gradeItems){
-//            if(courseID.equals(courseIDForGradeItem)){
                 double scoreWeightProduct = gradeItem.getScore() * gradeItem.getWeight();
-//                System.out.println("scoreWeightProduct: " + scoreWeightProduct);
                 scoreTotal += scoreWeightProduct;
                 weightTotal += gradeItem.getWeight();
-//            }
 
         }
 
-        double calculatedGrade = scoreTotal / weightTotal;
-
-        return calculatedGrade;
+        return scoreTotal / weightTotal;
 
     }
-
-
-
 
 
     public List<GradeItem> getGradeItems() {
@@ -105,7 +94,6 @@ public class EnrolledCourse {
         return course;
     }
 
-//    public Student getStudent() {return student;}
 
     public Long getId() {
         return id;
