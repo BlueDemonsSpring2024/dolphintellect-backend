@@ -2,9 +2,7 @@ package com.bluedemons2024.dolphintellect_backend.Student;
 
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
-import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

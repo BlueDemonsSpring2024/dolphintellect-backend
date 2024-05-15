@@ -42,8 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/courses").permitAll()
                         .requestMatchers("/accounts").permitAll()
-//                        .requestMatchers("/student/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
+                        .requestMatchers("/student/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
                 )
                 .httpBasic(Customizer.withDefaults());
 

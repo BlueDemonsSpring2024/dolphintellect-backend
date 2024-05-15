@@ -1,14 +1,13 @@
 package com.bluedemons2024.dolphintellect_backend.Student;
 
 
-import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourseRepository;
-import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseWrapper;
+import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.EnrolledCourseDTO;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper.UpdateEnrolledCourseDTO;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItem;
 import com.bluedemons2024.dolphintellect_backend.GradeItem.GradeItemRepository;
@@ -17,8 +16,6 @@ import com.bluedemons2024.dolphintellect_backend.GradeItemWrapper.GradeItemWrapp
 import com.bluedemons2024.dolphintellect_backend.config.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,7 +26,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/student")
 
-@SuppressWarnings("deprecation")
 public class StudentController {
 
     private final StudentRepository studentRepository;
@@ -45,8 +41,6 @@ public class StudentController {
         this.userRepistory = userRepistory;
         this.gradeItemRepository = gradeItemRepository;
     }
-
-
 
     @GetMapping("all")
     public List<Student> findAll(){
@@ -76,30 +70,51 @@ public class StudentController {
 
     }
 
-
-
     ////////////////////////////
     //  ENROLLED COURSE       //
     ////////////////////////////
 
-    //Successfully enrolling student with jwt auth
+
     @PostMapping("enroll-jwt")
-    public void addCourseToEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseWrapper enrolledCourseWrapper ){
+    public void addCourseToEnrollment(@RequestHeader("Authorization") String authorizationHeader, @RequestBody EnrolledCourseDTO enrolledCourseDTO ){
 
         String studentID = this.getStudentID(authorizationHeader);
 
-        String courseID = enrolledCourseWrapper.getCourseID();
-        EnrolledCourse enrolledCourse = enrolledCourseWrapper.getEnrolledCourse();
+        Optional<String> courseID = enrolledCourseDTO.getCourseID();
+
+        Optional<String> term = enrolledCourseDTO.getTerm();
+        Optional<Integer> year = enrolledCourseDTO.getYear();
+        Optional<Integer> credits = enrolledCourseDTO.getCredits();
+        Optional<String> finalGrade = enrolledCourseDTO.getFinalGrade();
+
+
+        EnrolledCourse enrolledCourse = new EnrolledCourse();
+
+        if(term != null){
+            enrolledCourse.setTerm(term.get());
+        }
+
+        if(year != null){
+            enrolledCourse.setYear(year.get());
+        }
+
+        if (credits != null){
+            enrolledCourse.setCredits(credits.get());
+        }
+
+        if(finalGrade != null){
+            enrolledCourse.setFinalGrade(finalGrade.get());
+        }
+
 
         Optional<Student> student = studentRepository.findById(studentID);
-        Optional<Course> course = courseRepository.findById(courseID);
+        Optional<Course> course = courseRepository.findById(courseID.get());
 
         enrolledCourse.setCourse(course.get());
         student.get().getEnrolledCourses().add(enrolledCourse);
         studentRepository.save(student.get());
 
     }
-
 
     //Successfully update enrollment
     @PutMapping("enroll-update-jwt")
@@ -139,7 +154,6 @@ public class StudentController {
 
     @DeleteMapping("enroll-delete-jwt/{id}")
     public void deleteCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id){
-//        System.out.println("deleteCourseEnrollment Route");
         String studentID = this.getStudentID(authorizationHeader);
         Optional<Student> student = studentRepository.findById(studentID);
         List<EnrolledCourse> enrolledCourses = student.get().getEnrolledCourses();
@@ -294,28 +308,5 @@ public class StudentController {
 
         return studentId;
     }
-
-    private List<Role> getUserRoles(String authorizationHeader) {
-        List<Role> roles = new ArrayList<>();
-
-        String jwtToken = authorizationHeader.substring(7);
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_SECRET)
-                .parseClaimsJws(jwtToken)
-                .getBody();
-
-        String username = claims.getSubject();
-
-        Optional<UserEntity> user = userRepistory.findByUsername(username);
-
-        if (user.isPresent()) {
-            UserEntity userEntity = user.get();
-            roles = userEntity.getRoles();
-        }
-
-        return roles;
-    }
-
 
 }
