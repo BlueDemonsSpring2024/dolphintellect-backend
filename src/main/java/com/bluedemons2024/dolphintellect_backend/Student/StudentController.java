@@ -230,6 +230,7 @@ public class StudentController {
         if (courseIDOptional.isPresent()) {
             Optional<Course> courseOptional = courseRepository.findById(courseIDOptional.get());
             course = courseOptional.orElse(null);
+            System.out.println("Course Title: " + course.getTitle());
         }
 
         Optional<String> name = gradeItemDTO.getName();
