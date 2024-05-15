@@ -1,5 +1,6 @@
-package com.bluedemons2024.dolphintellect_backend.config;
+package com.bluedemons2024.dolphintellect_backend.Security;
 
+import com.bluedemons2024.dolphintellect_backend.Account.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

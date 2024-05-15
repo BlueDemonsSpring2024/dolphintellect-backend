@@ -1,28 +1,21 @@
 package com.bluedemons2024.dolphintellect_backend.Course;
 
 
-//import jakarta.persistence.Id;
-//import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@ConfigurationProperties(prefix = "spring.neo4j")
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
 
-//    private final CourseRepository courseRepository;
-//
-//    public CourseController(CourseRepository courseRepository){
-//        this.courseRepository = courseRepository;
-//    }
+    private final CourseRepository courseRepository;
 
-    @Autowired
-    CourseRepository courseRepository;
+    public CourseController(CourseRepository courseRepository){
+        this.courseRepository = courseRepository;
+    }
+
 
     //Get all courses
     @GetMapping
@@ -64,7 +57,6 @@ public class CourseController {
     }
 
 
-    //TODO: create update a course
     @PutMapping()
     public void updateCourse(@RequestBody CourseDTO courseDTO){
         String courseID = courseDTO.getCourseID().get();

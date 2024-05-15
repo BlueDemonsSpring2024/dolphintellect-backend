@@ -1,4 +1,4 @@
-package com.bluedemons2024.dolphintellect_backend.EnrolledCourseWrapper;
+package com.bluedemons2024.dolphintellect_backend.EnrolledCourse;
 
 import java.util.Optional;
 

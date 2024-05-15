@@ -1,9 +1,9 @@
-package com.bluedemons2024.dolphintellect_backend.config;
+package com.bluedemons2024.dolphintellect_backend.Security;
 
+import com.bluedemons2024.dolphintellect_backend.Account.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -42,8 +42,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/courses").permitAll()
                         .requestMatchers("/accounts").permitAll()
-//                        .requestMatchers("/student/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
+                        .requestMatchers("/student/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
                 )
                 .httpBasic(Customizer.withDefaults());
 
