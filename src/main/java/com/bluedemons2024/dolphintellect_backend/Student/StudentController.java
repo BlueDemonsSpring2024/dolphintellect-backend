@@ -321,7 +321,7 @@ public class StudentController {
     //  Helpers               //
     ////////////////////////////
 
-    //TODO: get grade items for a specific course
+
     public List<GradeItem> getGradeItemsForStudentByCourse(String studentID,String courseID){
         Student student = studentRepository.findById(studentID).orElse(null);
 

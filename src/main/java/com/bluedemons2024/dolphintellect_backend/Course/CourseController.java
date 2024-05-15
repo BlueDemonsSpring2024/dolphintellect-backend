@@ -57,7 +57,6 @@ public class CourseController {
     }
 
 
-    //TODO: create update a course
     @PutMapping()
     public void updateCourse(@RequestBody CourseDTO courseDTO){
         String courseID = courseDTO.getCourseID().get();
