@@ -1,18 +1,25 @@
 package com.bluedemons2024.dolphintellect_backend.Course;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class CourseControllerTest {
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void findAll() {
     }
 
     @Test
-    void findAll() {
+    void findCourseBySubject() {
+    }
+
+    @Test
+    void findCourseByNumber() {
+    }
+
+    @Test
+    void findCourseBySubjectAndNumber() {
     }
 
     @Test
@@ -20,11 +27,11 @@ class CourseControllerTest {
     }
 
     @Test
-    void findCoursesBySubject() {
+    void addCourse() {
     }
 
     @Test
-    void addCourse() {
+    void updateCourse() {
     }
 
     @Test
