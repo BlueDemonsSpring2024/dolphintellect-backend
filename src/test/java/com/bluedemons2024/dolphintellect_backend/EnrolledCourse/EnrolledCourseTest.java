@@ -22,7 +22,7 @@ class EnrolledCourseTest {
     private GradeItem gradeItem;
     private ArrayList<GradeItem> gradeItems;
     @GeneratedValue
-    private long id;
+    private long id ;
 
     @BeforeEach
     void setup(){

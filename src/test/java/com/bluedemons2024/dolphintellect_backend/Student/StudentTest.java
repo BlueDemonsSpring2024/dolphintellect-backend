@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,14 +20,11 @@ class StudentTest {
     private ArrayList<GradeItem> gradeItems;
     private Course course;
 
-
-
-
-    @BeforeEach
-    void setUp(){
+    @Test
+    void isEnrolledIn() {
         student = new Student("1","Fake Student");
         enrolledCourse = new EnrolledCourse();
-        enrolledCourses = new ArrayList<>();
+        //enrolledCourses = new ArrayList<>();
         gradeItems = new ArrayList<>();
         gradeItem = new GradeItem();
         course = new Course();
@@ -53,22 +49,13 @@ class StudentTest {
         enrolledCourse.setCalculatedGrade(88.5);
         enrolledCourse.setCredits(4);
         enrolledCourse.setGradeItems(gradeItems);
-        //student.isEnrolledIn(enrolledCourse);
-
-
-
-
-
-
-
-
-    }
-
-    @Test
-    void isEnrolledIn() {
+        enrolledCourses = new ArrayList<>();
         System.out.println(enrolledCourse);
-        enrolledCourses.add(enrolledCourse);
+        //enrolledCourses.add(enrolledCourse);
         System.out.println(enrolledCourses);
+        System.out.println(gradeItems);
+        student.setGradeItems(gradeItems);
+        student.setGradeItem(gradeItem);
         //student.isEnrolledIn(enrolledCourse);
         //assertEquals(1,enrolledCourses.size());
 
@@ -76,21 +63,69 @@ class StudentTest {
 
     @Test
     void setGradeItem() {
+        student = new Student("1","Fake Student");
+        gradeItems = new ArrayList<>();
+        gradeItem = new GradeItem();
+        course = new Course();
+
+        course.setDescription("fake desc");
+        course.setNumber(242);
+        course.setSubject("Computer Science");
+        course.setTitle("Comp Sci 1");
+
+        gradeItem.setName("Homework");
+        gradeItem.setScore(90.5);
+        gradeItem.setWeight(15.0);
+        gradeItem.setCourse(course);
+        gradeItem.setId(350L);
+
+        gradeItems.add(gradeItem);
+
+
+        student.setGradeItems(gradeItems);
         student.setGradeItem(gradeItem);
+        assertEquals(gradeItems,student.getGradeItems());
 
     }
 
     @Test
     void getGpa() {
+        student = new Student("1","Fake Student");
+        gradeItems = new ArrayList<>();
+        gradeItem = new GradeItem();
+        course = new Course();
+
+        course.setDescription("fake desc");
+        course.setNumber(242);
+        course.setSubject("Computer Science");
+        course.setTitle("Comp Sci 1");
+
+        gradeItem.setName("Homework");
+        gradeItem.setScore(90.5);
+        gradeItem.setWeight(15.0);
+        gradeItem.setCourse(course);
+        gradeItem.setId(350L);
+
+        gradeItems.add(gradeItem);
+
+
+        student.setGradeItems(gradeItems);
+        student.setGradeItem(gradeItem);
+
         assertEquals(4.0,student.getGpa());
     }
 
     @Test
     void setId(){
+        student=new Student("1","fakename");
+        student.setId("123445");
+        assertEquals("123445",student.getId());
     }
 
     @Test
     void getId(){
+        student=new Student("1","fakename");
+        assertEquals("1",student.getId());
 
     }
 }

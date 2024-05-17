@@ -11,8 +11,12 @@ class CourseTest {
 
     @Test
     void getId() {
-
-    //NEED TO DO
+        Course course = new Course();
+        course.setSubject("Fake Subject");
+        course.setSubject("Some Subject");
+        course.setNumber(1);
+        course.setTitle("Fake Title");
+        assertNull(course.getId());
 
     }
 
