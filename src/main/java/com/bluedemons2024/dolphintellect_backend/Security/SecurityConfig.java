@@ -47,10 +47,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/api/auth/delete-student/").hasAuthority("ADMIN") //delete-student
 
 
-                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/courses/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/courses/**").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/courses/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/courses/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAuthority("ADMIN")
 
                         .requestMatchers("/student/all").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/student").hasAuthority("USER")
