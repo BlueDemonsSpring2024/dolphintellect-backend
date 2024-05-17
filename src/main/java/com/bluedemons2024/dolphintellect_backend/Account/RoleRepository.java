@@ -9,4 +9,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     @Override
     void deleteAllById(Iterable<? extends Long> longs);
+
+    boolean existsByName(String name);
+
 }

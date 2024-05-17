@@ -4,6 +4,7 @@ import com.bluedemons2024.dolphintellect_backend.Account.CustomUserDetailsServic
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -39,11 +40,28 @@ public class SecurityConfig {
                  .exceptionHandling((exception)-> exception.authenticationEntryPoint(authEntryPoint))
                  .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeHttpRequests-> authorizeHttpRequests
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/courses").permitAll()
-                        .requestMatchers("/accounts").permitAll()
-                        .requestMatchers("/student/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/student/all").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll() //login
+                        .requestMatchers(HttpMethod.POST,"/api/auth/register-admin").hasAuthority("ADMIN") //register-admin
+                        .requestMatchers(HttpMethod.POST,"/api/auth/register-student").hasAuthority("ADMIN") //register-student
+                        .requestMatchers(HttpMethod.DELETE,"/api/auth/delete-student/").hasAuthority("ADMIN") //delete-student
+
+
+                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/courses/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/courses/**").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/courses/**").hasAuthority("ADMIN")
+
+                        .requestMatchers("/student/all").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/student").hasAuthority("USER")
+
+                        .requestMatchers(HttpMethod.POST,"/student/enrolled-course").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT,"/student/enrolled-course").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/student/enrolled-course/**").hasAuthority("USER")
+
+                        .requestMatchers(HttpMethod.POST,"/student/grade-item").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT,"/student/grade-item").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/student/grade-item/**").hasAuthority("USER")
+
                 )
                 .httpBasic(Customizer.withDefaults());
 
