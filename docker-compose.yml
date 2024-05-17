@@ -1,11 +1,25 @@
 version: '3.8'
 
 services:
-  app:
+
+  client:
+    image: dolphintellect-client:latest
+    ports:
+      - "8989:80"
+    container_name: dolphintellect-client
+    depends_on:
+      - dolphintellect-api
+    networks:
+      - mynetwork
+
+
+  dolphintellect-api:
     build: .
     image: dolphintellect-api:latest
     ports:
       - "8081:8080"
+    networks:
+      - mynetwork
     container_name: dolphintellect-container
     depends_on:
       mysql_container:
@@ -14,12 +28,15 @@ services:
         condition: service_healthy
 
 
+
   neo4jcontainer:
     container_name: dolphintellect_neo4j
     image: neo4j:latest
     ports:
       - "7475:7474"
       - "7688:7687"
+    networks:
+      - mynetwork
     environment:
       - NEO4J_AUTH=neo4j/password
 #    env_file:
@@ -39,6 +56,8 @@ services:
     restart: always
     ports:
         - "3307:3306"
+    networks:
+      - mynetwork
     env_file:
       - .env
     environment:
@@ -53,3 +72,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+networks:
+  mynetwork:
+    driver: bridge
