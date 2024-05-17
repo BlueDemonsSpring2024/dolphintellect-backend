@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAuthority("ADMIN")
 
                         .requestMatchers("/api/student/all").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/student").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.GET,"/api/student").hasAuthority("USER")
 
                         .requestMatchers(HttpMethod.POST,"/api/student/enrolled-course").hasAuthority("USER")
                         .requestMatchers(HttpMethod.PUT,"/api/student/enrolled-course").hasAuthority("USER")

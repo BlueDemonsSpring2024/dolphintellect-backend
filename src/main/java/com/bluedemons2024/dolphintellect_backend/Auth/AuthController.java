@@ -48,6 +48,10 @@ public class AuthController {
 
     @PostMapping("login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDto loginDto) {
+        System.out.println("Attempted Login");
+        System.out.println(loginDto.getUsername());
+        System.out.println(loginDto.getPassword());
+
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
