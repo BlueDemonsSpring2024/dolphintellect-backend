@@ -40,6 +40,7 @@ public class SecurityConfig {
                  .exceptionHandling((exception)-> exception.authenticationEntryPoint(authEntryPoint))
                  .sessionManagement(sessionManagementCustomizer -> sessionManagementCustomizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeHttpRequests-> authorizeHttpRequests
+                        .requestMatchers(HttpMethod.GET,"/api/health").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll() //login
                         .requestMatchers(HttpMethod.POST,"/api/auth/register-admin").hasAuthority("ADMIN") //register-admin
                         .requestMatchers(HttpMethod.POST,"/api/auth/register-student").hasAuthority("ADMIN") //register-student
