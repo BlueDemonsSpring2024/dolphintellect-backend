@@ -64,7 +64,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE,"/api/student/grade-item/**").hasAuthority("USER")
 
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                 .cors(Customizer.withDefaults());
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
