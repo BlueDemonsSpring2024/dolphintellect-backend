@@ -52,16 +52,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasAuthority("ADMIN")
 
-                        .requestMatchers("/student/all").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET,"/student").hasAuthority("USER")
+                        .requestMatchers("/api/student/all").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/student").hasAuthority("USER")
 
-                        .requestMatchers(HttpMethod.POST,"/student/enrolled-course").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.PUT,"/student/enrolled-course").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.DELETE,"/student/enrolled-course/**").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.POST,"/api/student/enrolled-course").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/student/enrolled-course").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/student/enrolled-course/**").hasAuthority("USER")
 
-                        .requestMatchers(HttpMethod.POST,"/student/grade-item").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.PUT,"/student/grade-item").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.DELETE,"/student/grade-item/**").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.POST,"/api/student/grade-item").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/student/grade-item").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/student/grade-item/**").hasAuthority("USER")
 
                 )
                 .httpBasic(Customizer.withDefaults());
