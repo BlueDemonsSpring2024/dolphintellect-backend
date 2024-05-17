@@ -14,13 +14,5 @@ public class DolphIntellectBackend {
     }
 
 
-//    @Bean
-//    CommandLineRunner init(UserRepistory accountRepository) {
-//        return args -> {
-//            accountRepository.save(new UserEntity("user", "user@sample.com","password","5gggoin22rgnoin"));
-//            accountRepository.save(new UserEntity("admin", "admin@sample.com","password",null));
-//
-//        };
-//    }
 }
 

@@ -1,7 +1,7 @@
 package com.bluedemons2024.dolphintellect_backend.Student;
 
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
-import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
+import com.bluedemons2024.dolphintellect_backend.Account.UserRepository;
 import com.bluedemons2024.dolphintellect_backend.Course.Course;
 import com.bluedemons2024.dolphintellect_backend.Course.CourseRepository;
 import com.bluedemons2024.dolphintellect_backend.EnrolledCourse.EnrolledCourse;
@@ -26,12 +26,12 @@ public class StudentController {
 
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
-    private final UserRepistory userRepistory;
+    private final UserRepository userRepository;
 
-    public StudentController(StudentRepository studentRepository, CourseRepository courseRepository, UserRepistory userRepistory){
+    public StudentController(StudentRepository studentRepository, CourseRepository courseRepository, UserRepository userRepository){
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
-        this.userRepistory = userRepistory;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("all")
@@ -356,7 +356,7 @@ public class StudentController {
 
         String username = claims.getSubject();
 
-        Optional<UserEntity> user = userRepistory.findByUsername(username);
+        Optional<UserEntity> user = userRepository.findByUsername(username);
 
         if (user.isPresent()) {
             UserEntity userEntity = user.get();

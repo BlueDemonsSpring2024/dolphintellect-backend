@@ -56,6 +56,11 @@ public class CourseController {
         courseRepository.save(newCourse);
     }
 
+    @PostMapping("bulk")
+    public void addCourseBulk(@RequestBody List<Course> newCourses){
+        courseRepository.saveAll(newCourses);
+    }
+
 
     @PutMapping()
     public void updateCourse(@RequestBody CourseDTO courseDTO){

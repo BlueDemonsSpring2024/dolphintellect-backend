@@ -4,7 +4,7 @@ package com.bluedemons2024.dolphintellect_backend.Auth;
 import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.RoleRepository;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
-import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
+import com.bluedemons2024.dolphintellect_backend.Account.UserRepository;
 import com.bluedemons2024.dolphintellect_backend.Student.Student;
 import com.bluedemons2024.dolphintellect_backend.Student.StudentRepository;
 import com.bluedemons2024.dolphintellect_backend.Security.JWTGenerator;
@@ -26,7 +26,7 @@ public class AuthController {
 
     private final StudentRepository studentRepository;
     private AuthenticationManager authenticationManager;
-    private UserRepistory userRepistory;
+    private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
     private JWTGenerator jwtGenerator;
@@ -35,9 +35,9 @@ public class AuthController {
 
 
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserRepistory userRepistory, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator, StudentRepository studentRepository) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator, StudentRepository studentRepository) {
         this.authenticationManager = authenticationManager;
-        this.userRepistory = userRepistory;
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
@@ -56,9 +56,9 @@ public class AuthController {
 
 
     //Used to Register A Student
-    @PostMapping("registerAdmin")
+    @PostMapping("register-admin")
     public ResponseEntity<String> registerAdmin(@RequestBody RegisterDto registerDto) {
-        if(userRepistory.existsByUsername(registerDto.getUsername())) {
+        if(userRepository.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
         }
 
@@ -71,7 +71,7 @@ public class AuthController {
         Role roles = roleRepository.findByName("ADMIN").get();
         user.setRoles(Collections.singletonList(roles));
 
-        userRepistory.save(user);
+        userRepository.save(user);
 
         return new ResponseEntity<>("Admin User registered successfully!", HttpStatus.OK);
     }
@@ -79,12 +79,10 @@ public class AuthController {
 
 
 
-
-
     //Used to Register A Student
-    @PostMapping("register")
+    @PostMapping("register-student")
     public ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
-        if(userRepistory.existsByUsername(registerDto.getUsername())) {
+        if(userRepository.existsByUsername(registerDto.getUsername())) {
             return new ResponseEntity<>("Username is taken!", HttpStatus.BAD_REQUEST);
         }
 
@@ -100,22 +98,22 @@ public class AuthController {
         Role roles = roleRepository.findByName("USER").get();
         user.setRoles(Collections.singletonList(roles));
 
-        userRepistory.save(user);
+        userRepository.save(user);
 
         return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
     }
 
 
     //Delete a student
-    @DeleteMapping("deleteStudent/{id}")
+    @DeleteMapping("delete-student/{id}")
     public ResponseEntity<String> deleteStudent(@PathVariable long id) {
 
-        if (!userRepistory.existsById(id)){
+        if (!userRepository.existsById(id)){
             return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
         }
 
         //get the user
-        UserEntity user = userRepistory.findById(id).get();
+        UserEntity user = userRepository.findById(id).get();
 
         //get the student id
         String studentID = user.getStudentID();
@@ -124,10 +122,10 @@ public class AuthController {
         studentRepository.deleteById(studentID);
 
         // delete the user roles
-        userRepistory.deleteAllById(Collections.singleton(id));
+        userRepository.deleteAllById(Collections.singleton(id));
 
         //delete the user from accounts
-        userRepistory.deleteById(id);
+        userRepository.deleteById(id);
         return new ResponseEntity<>("User Deleted successfully!", HttpStatus.OK);
     }
 

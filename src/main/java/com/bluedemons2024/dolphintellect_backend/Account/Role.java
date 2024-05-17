@@ -1,6 +1,11 @@
 package com.bluedemons2024.dolphintellect_backend.Account;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Setter
+@Getter
 @Entity(name="mysql_role")
 @Table(name="roles")
 public class Role {
@@ -9,25 +14,13 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    public String getName() {
-        return name;
+    public Role() {
     }
 
-    public void setName(String name) {
+    public Role(String name) {
         this.name = name;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 }
