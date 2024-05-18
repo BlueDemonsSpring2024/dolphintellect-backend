@@ -13,6 +13,7 @@ import com.bluedemons2024.dolphintellect_backend.GradeItem.UpdateGradeItemDTO;
 import com.bluedemons2024.dolphintellect_backend.Security.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin
+@CrossOrigin(methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/student")
 public class StudentController {
@@ -154,8 +156,12 @@ public class StudentController {
     }
 
 
+    //TODO: FIND and fix error that is causing DELETE request to be denied.
     @DeleteMapping("enrolled-course/{id}")
+//    @GetMapping("enrolled-course-delete/{id}")
     public void deleteCourseEnrollment(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long id){
+        System.out.println("ROUTE WAS HIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
         String studentID = this.getStudentID(authorizationHeader);
         Optional<Student> studentOptional = studentRepository.findById(studentID);
         Student student = studentOptional.orElse(null);
