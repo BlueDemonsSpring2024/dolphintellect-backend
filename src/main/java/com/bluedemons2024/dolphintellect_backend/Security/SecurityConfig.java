@@ -57,11 +57,11 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST,"/api/student/enrolled-course").hasAuthority("USER")
                         .requestMatchers(HttpMethod.PUT,"/api/student/enrolled-course").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/student/enrolled-course/**").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/student/enrolled-course").hasAuthority("USER")
 
                         .requestMatchers(HttpMethod.POST,"/api/student/grade-item").hasAuthority("USER")
                         .requestMatchers(HttpMethod.PUT,"/api/student/grade-item").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/student/grade-item/**").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/student/grade-item").hasAuthority("USER")
 
                 )
                 .httpBasic(Customizer.withDefaults())
