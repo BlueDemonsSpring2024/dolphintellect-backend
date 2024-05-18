@@ -22,7 +22,7 @@ class StudentTest {
 
     @Test
     void isEnrolledIn() {
-        student = new Student("1","Fake Student");
+        student = new Student("1","fakename");
         enrolledCourse = new EnrolledCourse();
         //enrolledCourses = new ArrayList<>();
         gradeItems = new ArrayList<>();
@@ -63,7 +63,7 @@ class StudentTest {
 
     @Test
     void setGradeItem() {
-        student = new Student("1","Fake Student");
+        student = new Student("1","fakename");
         gradeItems = new ArrayList<>();
         gradeItem = new GradeItem();
         course = new Course();
@@ -90,7 +90,7 @@ class StudentTest {
 
     @Test
     void getGpa() {
-        student = new Student("1","Fake Student");
+        student = new Student("1","fakename");
         gradeItems = new ArrayList<>();
         gradeItem = new GradeItem();
         course = new Course();

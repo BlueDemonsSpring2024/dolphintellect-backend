@@ -1,9 +1,11 @@
 package com.bluedemons2024.dolphintellect_backend.Auth;
 
+import com.bluedemons2024.dolphintellect_backend.Account.Role;
 import com.bluedemons2024.dolphintellect_backend.Account.RoleRepository;
 import com.bluedemons2024.dolphintellect_backend.Account.UserEntity;
 import com.bluedemons2024.dolphintellect_backend.Account.UserRepistory;
 import com.bluedemons2024.dolphintellect_backend.Security.JWTGenerator;
+import com.bluedemons2024.dolphintellect_backend.Student.Student;
 import com.bluedemons2024.dolphintellect_backend.Student.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -47,7 +50,7 @@ class AuthControllerTest {
         MockitoAnnotations.openMocks(this);
         authController= new AuthController(authenticationManager,userRepistory,roleRepository,passwordEncoder,jwtGenerator,studentRepository);
 
-        loginDto = new LoginDto();
+        loginDto=new LoginDto();
         loginDto.setPassword("testpassword");
         loginDto.setUsername("testusername");
     }
@@ -56,9 +59,6 @@ class AuthControllerTest {
     void login() {
         Authentication authentication=mock(Authentication.class);
         String mockToken="fakeToken";
-
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(jwtGenerator.generateToken(authentication)).thenReturn(mockToken);
 
         ResponseEntity<AuthResponseDTO> resp=authController.login(loginDto);
 
@@ -75,10 +75,59 @@ class AuthControllerTest {
 
     @Test
     void registerAdmin() {
+        RegisterDto registerDto =new RegisterDto();
+        registerDto.setUsername("fakeuser");
+        registerDto.setPassword("fakepassword");
+        registerDto.setStudentName("fakename");
+
+        when(passwordEncoder.encode(registerDto.getPassword())).thenReturn("password found!");
+        Role userRole =new Role();
+        userRole.setName("ADMIN");
+        when(roleRepository.findByName("ADMIN")).thenReturn(Optional.of(userRole));
+
+        ResponseEntity<String> resp=authController.registerAdmin(registerDto);
+
+        assertEquals(HttpStatus.OK,resp.getStatusCode());
+        assertEquals("Admin User registered successfully!",resp.getBody());
+
+        ArgumentCaptor<UserEntity> captorUser= ArgumentCaptor.forClass(UserEntity.class);
+        verify(userRepistory).save(captorUser.capture());
+        UserEntity savedUser = captorUser.getValue();
+        assertEquals("fakeuser",savedUser.getUsername());
+        assertEquals("password found!",savedUser.getPassword());
+
     }
 
     @Test
     void register() {
+        RegisterDto registerDto =new RegisterDto();
+        registerDto.setUsername("fakeuser");
+        registerDto.setPassword("fakepassword");
+        registerDto.setStudentName("fakename");
+
+        when(passwordEncoder.encode(registerDto.getPassword())).thenReturn("encodedPassword");
+        Role userRole =new Role();
+        userRole.setName("USER");
+        when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
+
+        ResponseEntity<String> resp=authController.register(registerDto);
+
+        assertEquals(HttpStatus.OK,resp.getStatusCode());
+        assertEquals("User registered successfully!",resp.getBody());
+
+        ArgumentCaptor<Student> captorStudent= ArgumentCaptor.forClass(Student.class);
+        verify(studentRepository).save(captorStudent.capture());
+        Student savedStudent=captorStudent.getValue();
+        assertEquals("fakename",savedStudent.getName());
+
+        ArgumentCaptor<UserEntity> captorUser = ArgumentCaptor.forClass(UserEntity.class);
+        verify(userRepistory).save(captorUser.capture());
+        UserEntity savedUser =captorUser.getValue();
+        assertEquals("fakeuser",savedUser.getUsername());
+        assertEquals("encodedPassword",savedUser.getPassword());
+        assertTrue(savedUser.getRoles().contains(userRole));
+        assertEquals(savedStudent.getId(),savedUser.getStudentID());
+
     }
 
     @Test
