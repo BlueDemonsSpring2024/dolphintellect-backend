@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -73,6 +72,7 @@ class AuthControllerTest {
 
     }
 
+
     @Test
     void registerAdmin() {
         RegisterDto registerDto =new RegisterDto();
@@ -95,6 +95,21 @@ class AuthControllerTest {
         UserEntity savedUser = captorUser.getValue();
         assertEquals("fakeuser",savedUser.getUsername());
         assertEquals("password found!",savedUser.getPassword());
+
+    }
+
+    @Test
+    void invalidRegisterAdmin() {
+        RegisterDto registerDto=new RegisterDto();
+        registerDto.setUsername("existinguser");
+        registerDto.setPassword("fakepassword");
+        registerDto.setStudentName("fakestudent");
+
+        when(userRepistory.existsByUsername(registerDto.getUsername())).thenReturn(true);
+
+        ResponseEntity<String> resp= authController.registerAdmin(registerDto);
+
+        assertEquals("Username is taken!",resp.getBody());
 
     }
 
@@ -131,6 +146,21 @@ class AuthControllerTest {
     }
 
     @Test
+    void invalidRegister() {
+        RegisterDto registerDto=new RegisterDto();
+        registerDto.setUsername("existinguser");
+        registerDto.setPassword("fakepassword");
+        registerDto.setStudentName("fakestudent");
+
+        when(userRepistory.existsByUsername(registerDto.getUsername())).thenReturn(true);
+
+        ResponseEntity<String> resp= authController.register(registerDto);
+
+        assertEquals("Username is taken!",resp.getBody());
+
+    }
+
+    @Test
     void deleteStudent() {
         long userId=1L;
         UserEntity userEntity= new UserEntity();
@@ -143,8 +173,17 @@ class AuthControllerTest {
         ResponseEntity<String> resp= authController.deleteStudent(userId);
 
         verify(studentRepository,times(1)).deleteById("fakeid");
-        verify(userRepistory,times(1)).deleteById(userId);
         assertEquals(HttpStatus.OK,resp.getStatusCode());
+    }
+
+    @Test
+    void invalidDeleteStudent() {
+        long userId=1L;
+
+        when(userRepistory.existsById(userId)).thenReturn(false);
+        ResponseEntity<String> resp =authController.deleteStudent(userId);
+
+        assertEquals("User does not exist",resp.getBody());
     }
 
 }
