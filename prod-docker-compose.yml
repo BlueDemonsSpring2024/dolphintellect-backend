@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+
+  client:
+    image: raptorcentauri/dolphintellect-client:latest
+    ports:
+      - "80:80"
+    container_name: dolphintellect-client
+    restart: always
+    depends_on:
+      - dolphintellect-api
+    networks:
+      - mynetwork
+
+  
+  dolphintellect-api:
+    image: raptorcentauri/dolphintellect-api:latest
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+    networks:
+      - mynetwork
+    container_name: dolphintellect-container
+    depends_on:
+      mysql_container:
+        condition: service_healthy
+      neo4jcontainer:
+        condition: service_healthy
+  
+  
+  neo4jcontainer:
+    container_name: dolphintellect_neo4j
+    image: neo4j:latest
+    restart: always
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    volumes:
+      - neo4j_data:/data
+    networks:
+      - mynetwork
+    environment:
+      - NEO4J_AUTH=neo4j/password
+#    env_file:
+#      - .env
+#    environment:
+#      - NEO4J_AUTH=${NEO4JUSER}/${NEO4JPASSWORD}
+    healthcheck:
+      test: wget http://localhost:7474 || exit 1
+      interval: 1s
+      timeout: 10s
+      retries: 20
+      start_period: 3s
+
+  mysql_container:
+    container_name: dolphintellect_mysql
+    image: mysql
+    restart: always
+    ports:
+        - "3307:3306"
+    volumes:
+        - mysql_data:/var/lib/mysql
+    networks:
+      - mynetwork
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: dolphintellect
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  neo4j_data:
+  mysql_data:
+
+
+#  docker pull raptorcentauri/dolphintellect-client:latest
+
+#  docker pull raptorcentauri/dolphintellect-api
